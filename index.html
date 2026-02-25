@@ -4,49 +4,20 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Seño Bluemel – Taller de Escritura</title>
-
-  <!-- React 18 -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <!-- Babel (JSX in-browser) -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <!-- Tailwind CSS (play CDN – full utilities) -->
   <script src="https://cdn.tailwindcss.com"></script>
-
   <style>
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,sans-serif}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .animate-spin{animation:spin 1s linear infinite;display:inline-block}
     textarea{font-family:inherit}
   </style>
 </head>
-
 <body>
 <div id="root"></div>
-
-<!-- ═══════════════════════════════════════════════════════════
-     ⚠️  TEACHER SETUP (read before publishing!)
-     ════════════════════════════════════════════════════════════
-     OPTION A — Hard-code your Anthropic API key below so
-     students never see a setup screen.  Replace the empty
-     string with your key (starts with  sk-ant-...).
-
-     OPTION B — Leave TEACHER_API_KEY = "" and a one-time
-     setup prompt will appear the first time anyone opens the
-     page on each device.  The key is saved in localStorage so
-     students only enter it once.
-
-     ⚠️  Your key IS visible in the page source.  Do not share
-     the key publicly.  Consider creating a low-spend-limit key
-     at console.anthropic.com just for this class.
-     ═══════════════════════════════════════════════════════════ -->
-
 <script type="text/babel">
-// ── Teacher config ─────────────────────────────────────────────
-const TEACHER_API_KEY = ""; // ← paste sk-ant-... here (optional)
 
-// ── Data ───────────────────────────────────────────────────────
 const SPECIAL_CHARS = [
   {c:'á'},{c:'é'},{c:'í'},{c:'ó'},{c:'ú'},
   {c:'ü'},{c:'ñ'},{c:'Á'},{c:'É'},{c:'Í'},
@@ -92,7 +63,6 @@ const UNITS = {
 };
 
 const PROMPTS = [
-  // ── NOVICE LOW ──────────────────────────────────────────────
   {id:1,level:'noviceLow',unit:'identity',emoji:'👋',
    title:'¡Hola! — Greetings & Introductions',
    culturalTheme:'The Art of Greeting in the Spanish-Speaking World',
@@ -111,7 +81,7 @@ const PROMPTS = [
   {id:2,level:'noviceLow',unit:'family',emoji:'👨‍👩‍👧‍👦',
    title:'Mi Familia — My Family',
    culturalTheme:'La Familia — Heart of Latin American Life',
-   culturalFact:'Family is everything in most Spanish-speaking cultures. Extended family — grandparents, aunts, uncles, cousins — often live together or very close by. In Mexico and Colombia, Sunday family meals are a sacred tradition 🍽️. In many homes, grandparents (los abuelos) play a huge role in raising children. The word for family gathering, "reunión familiar," happens far more often than in many other cultures!',
+   culturalFact:'Family is everything in most Spanish-speaking cultures. Extended family — grandparents, aunts, uncles, cousins — often live together or very close by. In Mexico and Colombia, Sunday family meals are a sacred tradition 🍽️. In many homes, grandparents (los abuelos) play a huge role in raising children.',
    culturalRegion:'🇲🇽 Mexico · 🇨🇴 Colombia · 🇪🇸 Spain',
    writingTask:'Write the names of 3–5 family members and their relationship to you.',
    scaffolding:[
@@ -250,7 +220,6 @@ const PROMPTS = [
    example:'Tengo catorce años. Tengo dos mascotas y tres libros de español. Tengo doce lápices en mi mochila.',
    grammarTip:'💡 "Uno" becomes "un" before masculine nouns: un libro. Numbers 16–29 are written as one word: dieciséis, veintiuno.',
   },
-  // ── NOVICE MID ──────────────────────────────────────────────
   {id:11,level:'noviceMid',unit:'identity',emoji:'📅',
    title:'Mi Rutina Diaria — My Daily Routine',
    culturalTheme:'A Day in the Life in the Spanish-Speaking World',
@@ -270,7 +239,7 @@ const PROMPTS = [
   {id:12,level:'noviceMid',unit:'leisure',emoji:'⚽',
    title:'Los Deportes — Sports & Activities',
    culturalTheme:'Fútbol: The Passion of the Spanish-Speaking World',
-   culturalFact:'Fútbol (soccer) is more than a sport — it is a way of life! 🏆 Argentina has produced legends like Lionel Messi. Spain won the World Cup in 2010. On game days in Mexico City or Buenos Aires, streets become completely quiet as everyone gathers around a TV. The famous "¡GOOOL!" chant is recognized worldwide.',
+   culturalFact:'Fútbol (soccer) is more than a sport — it is a way of life! 🏆 Argentina has produced legends like Lionel Messi. Spain won the World Cup in 2010. On game days in Mexico City or Buenos Aires, streets become completely quiet as everyone gathers around a TV.',
    culturalRegion:'🇦🇷 Argentina · 🇲🇽 Mexico · 🇨🇴 Colombia · 🇪🇸 Spain',
    writingTask:'Write about a sport or activity you enjoy. Why do you like it? When and with whom do you play?',
    scaffolding:[
@@ -286,7 +255,7 @@ const PROMPTS = [
   {id:13,level:'noviceMid',unit:'leisure',emoji:'🎉',
    title:'Las Fiestas — Holidays & Celebrations',
    culturalTheme:'Vibrant Festivals of the Spanish-Speaking World',
-   culturalFact:'🪦🌼 El Día de los Muertos (Nov. 1–2) in Mexico is a joyful celebration of loved ones who have passed. Families build colorful altars (ofrendas) with food, candles, and marigold flowers — it is NOT sad, it is a reunion! 🕯️ Las Posadas (Dec. 16–24) reenact Mary and Joseph\'s search for shelter with candlelit processions and piñatas.',
+   culturalFact:'🪦🌼 El Día de los Muertos (Nov. 1–2) in Mexico is a joyful celebration of loved ones who have passed. Families build colorful altars (ofrendas) with food, candles, and marigold flowers. 🕯️ Las Posadas (Dec. 16–24) reenact Mary and Joseph\'s search for shelter with candlelit processions and piñatas.',
    culturalRegion:'🇲🇽 Mexico · 🇪🇸 Spain · 🇬🇹 Guatemala',
    writingTask:'Describe your favorite holiday or celebration. What do you do? Who do you celebrate with? What do you eat?',
    scaffolding:[
@@ -410,7 +379,7 @@ const PROMPTS = [
      {phrase:'Lo/La compro',meaning:'I buy it'},
    ],
    example:'Quiero comprar una chaqueta y unos tenis. Voy al centro comercial con mi mamá. La chaqueta cuesta veinte dólares. ¡Es muy barata! La compro.',
-   grammarTip:'💡 "Querer" = to want (stem-changing: yo quiero, tú quieres). The stem changes from e → ie. Another e→ie verb you know: tener → yo tengo (irregular), tú tienes.',
+   grammarTip:'💡 "Querer" = to want (stem-changing: yo quiero, tú quieres). The stem changes from e → ie.',
   },
   {id:21,level:'noviceMid',unit:'travel',emoji:'✈️',
    title:'Los Viajes — Travel & Transportation',
@@ -494,16 +463,8 @@ const PROMPTS = [
   },
 ];
 
-// ── PDF generator ───────────────────────────────────────────────
-function buildPdfHtml({studentName,period,prompt,level,writingText,feedback}){
+function buildPdfHtml({studentName,period,prompt,level,writingText}){
   const date = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-  const corrections = feedback?.improvements?.map(imp=>
-    `<tr>
-      <td style="padding:8px 12px;border-bottom:1px solid #eee;color:#dc2626;text-decoration:line-through">${imp.studentText||'—'}</td>
-      <td style="padding:8px 12px;border-bottom:1px solid #eee;color:#16a34a;font-weight:600">${imp.correction||'—'}</td>
-      <td style="padding:8px 12px;border-bottom:1px solid #eee;color:#555;font-size:13px">${imp.explanation||''}</td>
-    </tr>`
-  ).join('')||'';
   return `<!DOCTYPE html>
 <html lang="es"><head><meta charset="UTF-8"/>
 <title>Taller de Escritura – ${studentName}</title>
@@ -519,13 +480,6 @@ body{font-family:Arial,sans-serif;color:#1a1a1a;padding:40px;max-width:760px;mar
 .sec{background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:20px 24px;margin-bottom:20px}
 .sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:12px}
 .writing-box{background:#fff;border:2px solid #d1fae5;border-radius:10px;padding:18px 22px;font-size:15px;line-height:1.7;font-style:italic}
-.corrected-box{background:#fff;border:2px solid #a7f3d0;border-radius:10px;padding:18px 22px;font-size:15px;line-height:1.7;font-weight:600}
-.strengths{list-style:none}.strengths li{padding:6px 0;font-size:14px;color:#166534;display:flex;gap:10px}
-.strengths li::before{content:"✓";font-weight:700}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{background:#f3f4f6;padding:10px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280}
-.encourage{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:16px 20px;text-align:center;font-size:15px;font-weight:600;color:#92400e;margin-bottom:20px}
-.cultural{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px 18px;font-size:13px;color:#9a3412;margin-bottom:20px}
 .footer{text-align:center;font-size:12px;color:#9ca3af;margin-top:32px;border-top:1px solid #e5e7eb;padding-top:16px}
 </style></head><body>
 <div class="hdr"><div class="hdr-top">
@@ -535,55 +489,11 @@ th{background:#f3f4f6;padding:10px 12px;text-align:left;font-size:11px;text-tran
 <div class="sec"><div class="sec-title">📝 Writing Prompt</div>
 <p style="font-size:14px;color:#374151">${prompt.emoji} <strong>${prompt.title}</strong> — ${prompt.writingTask}</p></div>
 <div class="sec"><div class="sec-title">✍️ My Writing</div><div class="writing-box">${writingText}</div></div>
-${feedback?.strengths?.length?`<div class="sec"><div class="sec-title" style="color:#15803d">🌟 What I Did Well</div><ul class="strengths">${feedback.strengths.map(s=>`<li>${s}</li>`).join('')}</ul></div>`:''}
-${corrections?`<div class="sec"><div class="sec-title" style="color:#1d4ed8">📚 Corrections</div><table><thead><tr><th>My Writing</th><th>Corrected</th><th>Explanation</th></tr></thead><tbody>${corrections}</tbody></table></div>`:''}
-${feedback?.correctedVersion?`<div class="sec"><div class="sec-title" style="color:#065f46">✅ Polished Version</div><div class="corrected-box">${feedback.correctedVersion}</div></div>`:''}
-${feedback?.culturalNote?`<div class="cultural">🌍 <strong>Cultural Connection:</strong> ${feedback.culturalNote}</div>`:''}
-${feedback?.encouragement?`<div class="encourage">🎉 ${feedback.encouragement}</div>`:''}
 <div class="footer">Seño Bluemel Taller de Escritura · Generated ${date}</div>
 </body></html>`;
 }
 
-// ── API Key Setup Screen ────────────────────────────────────────
-function ApiKeySetup({onSave}){
-  const [key,setKey] = React.useState('');
-  const [err,setErr] = React.useState('');
-  const save = () => {
-    if(!key.trim().startsWith('sk-ant-')){ setErr('Please enter a valid Anthropic API key (starts with sk-ant-…)'); return; }
-    localStorage.setItem('taller_api_key', key.trim());
-    onSave(key.trim());
-  };
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8">
-        <div className="text-center mb-6">
-          <div className="text-5xl mb-3">✍️</div>
-          <h1 className="text-2xl font-bold text-gray-900">Seño Bluemel</h1>
-          <p className="text-gray-500 text-sm mt-1">Taller de Escritura · Spanish Writing Lab</p>
-        </div>
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5 text-sm text-amber-800">
-          <strong>🔑 One-time Setup:</strong> Enter your Anthropic API key to enable AI feedback. The key is saved on this device only.
-        </div>
-        <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">Anthropic API Key</label>
-        <input
-          type="password" value={key} onChange={e=>{setKey(e.target.value);setErr('');}}
-          placeholder="sk-ant-..."
-          className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-400 mb-2"
-        />
-        {err && <p className="text-red-600 text-xs mb-3">{err}</p>}
-        <button onClick={save} className="w-full bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold py-3 rounded-xl hover:opacity-90 transition-opacity mt-1">
-          Save & Start Writing
-        </button>
-        <p className="text-xs text-gray-400 text-center mt-4">
-          Get your key at <strong>console.anthropic.com</strong> · It's only stored on this device
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ── Share / PDF Modal ───────────────────────────────────────────
-function ShareModal({studentName,prompt,level,writingText,feedback,onClose}){
+function ShareModal({studentName,prompt,level,writingText,onClose}){
   const [name,setName] = React.useState(studentName||'');
   const [period,setPeriod] = React.useState('');
   const [copied,setCopied] = React.useState(false);
@@ -596,14 +506,10 @@ Date: ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'
 
 MY WRITING:
 ${writingText}
-${feedback?.correctedVersion?`\nPOLISHED VERSION:\n${feedback.correctedVersion}`:''}
-${feedback?.strengths?.length?`\nSTRENGTHS:\n${feedback.strengths.map(s=>'• '+s).join('\n')}`:''}
-${feedback?.improvements?.length?`\nCORRECTIONS:\n${feedback.improvements.map(i=>`• ${i.studentText||''} → ${i.correction||''}: ${i.explanation||''}`).join('\n')}`:''}
-${feedback?.encouragement?`\n${feedback.encouragement}`:''}
 --- Taller de Escritura ---`;
 
   const downloadPdf = ()=>{
-    const html = buildPdfHtml({studentName:name,period,prompt,level,writingText,feedback});
+    const html = buildPdfHtml({studentName:name,period,prompt,level,writingText});
     const blob = new Blob([html],{type:'text/html'});
     const url = URL.createObjectURL(blob);
     const win = window.open(url,'_blank');
@@ -669,29 +575,15 @@ ${feedback?.encouragement?`\n${feedback.encouragement}`:''}
   );
 }
 
-// ── Main App ────────────────────────────────────────────────────
 function App(){
-  // ── API key state ──
-  const [apiKey,setApiKey] = React.useState(()=>{
-    if(TEACHER_API_KEY) return TEACHER_API_KEY;
-    return localStorage.getItem('taller_api_key')||'';
-  });
-
-  // ── App state ──
   const [selectedLevel,setSelectedLevel] = React.useState('noviceLow');
   const [selectedUnit,setSelectedUnit] = React.useState('all');
   const [selectedPrompt,setSelectedPrompt] = React.useState(null);
   const [writingText,setWritingText] = React.useState('');
-  const [feedback,setFeedback] = React.useState(null);
-  const [isLoading,setIsLoading] = React.useState(false);
   const [view,setView] = React.useState('prompts');
   const [showShare,setShowShare] = React.useState(false);
   const [studentName,setStudentName] = React.useState('');
-  const [apiError,setApiError] = React.useState('');
   const taRef = React.useRef(null);
-
-  // Show setup screen if no API key
-  if(!apiKey) return <ApiKeySetup onSave={k=>setApiKey(k)}/>;
 
   const level = LEVELS[selectedLevel];
   const availableUnits = ['all',...Array.from(new Set(PROMPTS.filter(p=>p.level===selectedLevel).map(p=>p.unit)))];
@@ -706,59 +598,11 @@ function App(){
     setTimeout(()=>{ ta.selectionStart=ta.selectionEnd=s+1; ta.focus(); },0);
   };
 
-  const selectPrompt = p=>{ setSelectedPrompt(p); setWritingText(''); setFeedback(null); setApiError(''); setView('write'); };
+  const selectPrompt = p=>{ setSelectedPrompt(p); setWritingText(''); setView('write'); };
+  const reset = ()=>{ setView('prompts'); setSelectedPrompt(null); setWritingText(''); };
 
-  const reset = ()=>{ setView('prompts'); setSelectedPrompt(null); setWritingText(''); setFeedback(null); setApiError(''); };
-  const revise = ()=>{ setView('write'); setFeedback(null); setApiError(''); };
-
-  const getFeedback = async ()=>{
-    if(!writingText.trim()||!selectedPrompt) return;
-    setIsLoading(true); setFeedback(null); setApiError('');
-    const levelInstructions = selectedLevel==='noviceLow'
-      ? 'This is NOVICE LOW level. Comment ONLY on vocabulary and memorized phrases. Do NOT comment on grammar complexity. Students are writing just 3–10 words total. Praise every attempt warmly.'
-      : 'This is NOVICE MID level. Students are writing 15–40 words using simple sentences. Give ONE simple, clear grammar tip maximum. Focus on helping them build confidence.';
-    const sys = `You are a warm, encouraging Spanish language teacher for ACTFL ${level.label} level middle school beginners (ages 11–14).
-${levelInstructions}
-Rules:
-- Write ALL feedback in clear, simple English that a middle schooler can understand
-- Be VERY warm, positive, and celebratory — ALWAYS lead with genuine praise
-- Keep the total feedback SHORT and easy to read (under 200 words total)
-- Show corrected Spanish with EVERY suggestion
-- Use simple vocabulary — no complicated grammar terms
-- End with genuine, specific encouragement
-- If the student wrote very little, still find something to praise
-Respond ONLY with a valid JSON object (no markdown, no code fences, no extra text before or after):
-{"strengths":["specific praise 1","specific praise 2"],"improvements":[{"issue":"one simple thing to improve","studentText":"exactly what they wrote","correction":"the correct Spanish","explanation":"simple reason in plain English"}],"correctedVersion":"the full corrected Spanish text","encouragement":"a warm, specific closing sentence","culturalNote":"one interesting sentence connecting their writing to the cultural theme of this prompt"}`;
-    try {
-      const res = await fetch("https://api.anthropic.com/v1/messages",{
-        method:"POST",
-        headers:{"Content-Type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
-        body:JSON.stringify({
-          model:"claude-sonnet-4-20250514",max_tokens:1000,system:sys,
-          messages:[{role:"user",content:`Student level: ${level.label}\nPrompt topic: ${selectedPrompt.title}\nWriting task: ${selectedPrompt.writingTask}\nStudent's Spanish writing: "${writingText}"`}]
-        })
-      });
-      if(!res.ok){
-        const errData = await res.json().catch(()=>({}));
-        if(res.status===401) throw new Error('Invalid API key. Please check your key and reload the page.');
-        if(res.status===429) throw new Error('Too many requests. Please wait a moment and try again.');
-        throw new Error(errData.error?.message||`API error ${res.status}`);
-      }
-      const data = await res.json();
-      const raw = data.content.map(b=>b.text||'').join('').trim();
-      // Strip any accidental markdown fences
-      const clean = raw.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'').trim();
-      const parsed = JSON.parse(clean);
-      setFeedback(parsed); setView('feedback');
-    } catch(err){
-      setApiError(err.message||'Could not connect. Please check your internet connection and try again.');
-      setView('feedback');
-    } finally { setIsLoading(false); }
-  };
-
-  // Color helpers
   const isGreen = selectedLevel==='noviceLow';
-  const lvlBg   = isGreen?'bg-green-600':'bg-teal-600';
+  const lvlBg    = isGreen?'bg-green-600':'bg-teal-600';
   const lvlBorder= isGreen?'border-green-400':'border-teal-400';
   const lvlText  = isGreen?'text-green-700':'text-teal-700';
   const lvlBgLight=isGreen?'bg-green-50':'bg-teal-50';
@@ -769,10 +613,9 @@ Respond ONLY with a valid JSON object (no markdown, no code fences, no extra tex
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50">
       {showShare&&selectedPrompt&&(
         <ShareModal studentName={studentName} prompt={selectedPrompt} level={level}
-          writingText={writingText} feedback={feedback} onClose={()=>setShowShare(false)}/>
+          writingText={writingText} onClose={()=>setShowShare(false)}/>
       )}
 
-      {/* Header */}
       <header className="bg-gradient-to-r from-red-700 via-orange-600 to-yellow-500 text-white shadow-lg sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
@@ -788,22 +631,17 @@ Respond ONLY with a valid JSON object (no markdown, no code fences, no extra tex
             {view!=='prompts'&&(
               <button onClick={reset} className="text-sm bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full transition-colors whitespace-nowrap">← Prompts</button>
             )}
-            {(view==='write'||view==='feedback')&&writingText.trim()&&(
+            {view==='write'&&writingText.trim()&&(
               <button onClick={()=>setShowShare(true)}
                 className="text-sm bg-white text-orange-700 font-semibold hover:bg-orange-50 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow transition-colors whitespace-nowrap">
                 <span>📤</span> Share / PDF
               </button>
-            )}
-            {!TEACHER_API_KEY&&(
-              <button onClick={()=>{if(confirm('Change API key?')){ localStorage.removeItem('taller_api_key'); setApiKey(''); }}}
-                title="Change API key" className="text-xs bg-white/10 hover:bg-white/20 px-2 py-1.5 rounded-full transition-colors">🔑</button>
             )}
           </div>
         </div>
       </header>
 
       <div className="max-w-5xl mx-auto px-4 py-6">
-        {/* Student name bar (write/feedback views) */}
         {view!=='prompts'&&(
           <div className="flex items-center gap-3 mb-4 flex-wrap">
             <span className="text-sm text-gray-500 font-semibold whitespace-nowrap">Your name:</span>
@@ -813,7 +651,6 @@ Respond ONLY with a valid JSON object (no markdown, no code fences, no extra tex
           </div>
         )}
 
-        {/* Level Tabs */}
         <div className="flex gap-3 mb-4">
           {Object.values(LEVELS).map(lv=>(
             <button key={lv.id} onClick={()=>{ setSelectedLevel(lv.id); setSelectedUnit('all'); reset(); }}
@@ -829,7 +666,6 @@ Respond ONLY with a valid JSON object (no markdown, no code fences, no extra tex
           ))}
         </div>
 
-        {/* Guidelines bar */}
         <div className={`${lvlBgLight} border ${lvlBorder} rounded-xl p-4 mb-4`}>
           <div className="flex items-start gap-4 flex-wrap">
             <div className="flex-1 min-w-48">
@@ -847,10 +683,8 @@ Respond ONLY with a valid JSON object (no markdown, no code fences, no extra tex
           </div>
         </div>
 
-        {/* ── PROMPT LIST ── */}
         {view==='prompts'&&(
           <div>
-            {/* Unit filter */}
             <div className="flex flex-wrap gap-2 mb-4">
               {availableUnits.map(uid=>{
                 const u = uid==='all'?{label:'All Topics',emoji:'📚'}:UNITS[uid];
@@ -889,10 +723,8 @@ Respond ONLY with a valid JSON object (no markdown, no code fences, no extra tex
           </div>
         )}
 
-        {/* ── WRITE & FEEDBACK ── */}
-        {(view==='write'||view==='feedback')&&selectedPrompt&&(
+        {view==='write'&&selectedPrompt&&(
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-            {/* Left panel: prompt context */}
             <div className="lg:col-span-2 space-y-4">
               <div className="bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-xl p-4 shadow">
                 <div className="flex items-center gap-2 mb-2">
@@ -927,9 +759,7 @@ Respond ONLY with a valid JSON object (no markdown, no code fences, no extra tex
               </div>
             </div>
 
-            {/* Right panel: writing / feedback */}
             <div className="lg:col-span-3 space-y-4">
-              {/* Special characters */}
               <div className="bg-white rounded-xl border border-gray-200 p-3">
                 <p className="text-xs text-gray-500 font-semibold mb-2">⌨️ Spanish Characters — Click to Insert:</p>
                 <div className="flex flex-wrap gap-1.5">
@@ -942,117 +772,35 @@ Respond ONLY with a valid JSON object (no markdown, no code fences, no extra tex
                 </div>
               </div>
 
-              {/* Writing textarea */}
-              {view==='write'&&(
-                <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden shadow-sm">
-                  <div className={`${lvlBg} text-white px-4 py-2 flex justify-between items-center`}>
-                    <span className="text-sm font-semibold">Write in Spanish ✍️</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full bg-white/20 ${wordCount>0&&'font-bold'}`}>
-                      {wordCount} {wordCount===1?'word':'words'} · Target: {level.target}
-                    </span>
-                  </div>
-                  <textarea
-                    ref={taRef} value={writingText} onChange={e=>setWritingText(e.target.value)}
-                    placeholder={`Escribe aquí en español…\n\nTip: Click the buttons above to insert á, é, í, ó, ú, ñ, ¿, ¡`}
-                    className="w-full p-4 text-gray-800 text-base resize-none focus:outline-none min-h-48"
-                    spellCheck={false} autoCorrect="off" autoCapitalize="off"
-                  />
-                  <div className="px-4 pb-4 flex justify-between items-center gap-3 flex-wrap">
-                    <div className="text-xs text-gray-400 italic min-w-0 truncate">Try: "{level.starters[0]}"</div>
-                    <div className="flex gap-2 flex-shrink-0">
-                      {writingText.trim()&&(
-                        <button onClick={()=>setShowShare(true)}
-                          className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-orange-100 text-orange-700 hover:bg-orange-200 transition-colors flex items-center gap-1.5">
-                          📤 Share
-                        </button>
-                      )}
-                      <button onClick={getFeedback} disabled={!writingText.trim()||isLoading}
-                        className={`px-5 py-2.5 rounded-xl text-white font-bold text-sm transition-all ${
-                          !writingText.trim()||isLoading?'bg-gray-300 cursor-not-allowed':`${lvlBg} hover:opacity-90 shadow-md`
-                        }`}>
-                        {isLoading?(
-                          <span className="flex items-center gap-2">
-                            <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-                            </svg>Checking…
-                          </span>
-                        ):'✨ Get Feedback'}
-                      </button>
-                    </div>
-                  </div>
+              <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden shadow-sm">
+                <div className={`${lvlBg} text-white px-4 py-2 flex justify-between items-center`}>
+                  <span className="text-sm font-semibold">Write in Spanish ✍️</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full bg-white/20 ${wordCount>0&&'font-bold'}`}>
+                    {wordCount} {wordCount===1?'word':'words'} · Target: {level.target}
+                  </span>
                 </div>
-              )}
-
-              {/* Feedback */}
-              {view==='feedback'&&(
-                <div className="space-y-4">
-                  <div className="bg-white rounded-xl border-2 border-gray-200 p-4">
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Your Writing</p>
-                    <p className="text-sm text-gray-800 leading-relaxed italic">"{writingText}"</p>
-                  </div>
-
-                  {apiError?(
-                    <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
-                      <p className="font-semibold mb-1">⚠️ Oops!</p>
-                      <p>{apiError}</p>
-                      <button onClick={revise} className="mt-3 text-sm underline text-red-600">← Go back and try again</button>
-                    </div>
-                  ):feedback?(
-                    <>
-                      {feedback.strengths?.length>0&&(
-                        <div className="bg-green-50 border-2 border-green-300 rounded-xl p-4">
-                          <p className="text-sm font-bold text-green-700 mb-3">🌟 What You Did Well</p>
-                          <ul className="space-y-2">
-                            {feedback.strengths.map((s,i)=>(
-                              <li key={i} className="flex gap-2 text-sm text-green-800"><span className="font-bold">✓</span>{s}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      {feedback.improvements?.length>0&&(
-                        <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
-                          <p className="text-sm font-bold text-blue-700 mb-3">📚 One Thing to Improve</p>
-                          {feedback.improvements.map((imp,i)=>(
-                            <div key={i} className="space-y-2">
-                              <p className="text-sm text-blue-800 font-semibold">{imp.issue}</p>
-                              {imp.studentText&&(
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="text-xs bg-red-100 text-red-700 line-through px-2 py-1 rounded font-mono">{imp.studentText}</span>
-                                  <span className="text-gray-400">→</span>
-                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-bold font-mono">{imp.correction}</span>
-                                </div>
-                              )}
-                              <p className="text-xs text-gray-600">{imp.explanation}</p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {feedback.correctedVersion&&(
-                        <div className={`${lvlBgLight} border-2 ${lvlBorder} rounded-xl p-4`}>
-                          <p className={`text-xs font-bold ${lvlText} uppercase tracking-wide mb-2`}>✅ Polished Version</p>
-                          <p className="text-sm font-semibold text-gray-800 italic leading-relaxed">"{feedback.correctedVersion}"</p>
-                        </div>
-                      )}
-                      {feedback.culturalNote&&(
-                        <div className="bg-orange-50 border border-orange-200 rounded-xl p-3">
-                          <p className="text-xs text-orange-700">🌍 <strong>Cultural Connection:</strong> {feedback.culturalNote}</p>
-                        </div>
-                      )}
-                      {feedback.encouragement&&(
-                        <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-4 text-center">
-                          <p className="text-sm font-semibold text-yellow-800">🎉 {feedback.encouragement}</p>
-                        </div>
-                      )}
-                      <div className="flex gap-3 flex-wrap">
-                        <button onClick={revise} className={`flex-1 py-2.5 rounded-xl text-white font-bold text-sm ${lvlBg} hover:opacity-90 transition-opacity min-w-28`}>✏️ Revise</button>
-                        <button onClick={()=>setShowShare(true)} className="flex-1 py-2.5 rounded-xl text-white font-bold text-sm bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-90 transition-opacity min-w-36">📤 Share / PDF</button>
-                        <button onClick={reset} className="flex-1 py-2.5 rounded-xl text-gray-700 font-bold text-sm bg-white border-2 border-gray-300 hover:bg-gray-50 min-w-28">📝 New Topic</button>
-                      </div>
-                    </>
-                  ):null}
+                <textarea
+                  ref={taRef} value={writingText} onChange={e=>setWritingText(e.target.value)}
+                  placeholder={`Escribe aquí en español…\n\nTip: Click the buttons above to insert á, é, í, ó, ú, ñ, ¿, ¡`}
+                  className="w-full p-4 text-gray-800 text-base resize-none focus:outline-none min-h-48"
+                  spellCheck={false} autoCorrect="off" autoCapitalize="off"
+                />
+                <div className="px-4 pb-4 flex justify-between items-center gap-3 flex-wrap">
+                  <div className="text-xs text-gray-400 italic min-w-0 truncate">Try: "{level.starters[0]}"</div>
+                  {writingText.trim()&&(
+                    <button onClick={()=>setShowShare(true)}
+                      className="px-5 py-2.5 rounded-xl text-white font-bold text-sm bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-90 transition-opacity shadow flex items-center gap-2">
+                      📤 Share / Save PDF
+                    </button>
+                  )}
                 </div>
-              )}
+              </div>
+
+              <div className="flex gap-3">
+                <button onClick={reset} className="flex-1 py-2.5 rounded-xl text-gray-700 font-bold text-sm bg-white border-2 border-gray-300 hover:bg-gray-50">
+                  📝 New Topic
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -1065,9 +813,8 @@ Respond ONLY with a valid JSON object (no markdown, no code fences, no extra tex
   );
 }
 
-// ── Mount ──────────────────────────────────────────────────────
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App/>);
-  </script>
+</script>
 </body>
 </html>
