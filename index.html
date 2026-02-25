@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Seño Bluemel – Taller de Escritura</title>
+
+  <!-- React 18 -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel (JSX in-browser) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Tailwind CSS (play CDN – full utilities) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,sans-serif}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .animate-spin{animation:spin 1s linear infinite;display:inline-block}
+    textarea{font-family:inherit}
+  </style>
+</head>
+
+<body>
+<div id="root"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ⚠️  TEACHER SETUP (read before publishing!)
+     ════════════════════════════════════════════════════════════
+     OPTION A — Hard-code your Anthropic API key below so
+     students never see a setup screen.  Replace the empty
+     string with your key (starts with  sk-ant-...).
+
+     OPTION B — Leave TEACHER_API_KEY = "" and a one-time
+     setup prompt will appear the first time anyone opens the
+     page on each device.  The key is saved in localStorage so
+     students only enter it once.
+
+     ⚠️  Your key IS visible in the page source.  Do not share
+     the key publicly.  Consider creating a low-spend-limit key
+     at console.anthropic.com just for this class.
+     ═══════════════════════════════════════════════════════════ -->
+
+<script type="text/babel">
+// ── Teacher config ─────────────────────────────────────────────
+const TEACHER_API_KEY = ""; // ← paste sk-ant-... here (optional)
+
+// ── Data ───────────────────────────────────────────────────────
+const SPECIAL_CHARS = [
+  {c:'á'},{c:'é'},{c:'í'},{c:'ó'},{c:'ú'},
+  {c:'ü'},{c:'ñ'},{c:'Á'},{c:'É'},{c:'Í'},
+  {c:'Ó'},{c:'Ú'},{c:'Ñ'},{c:'¿'},{c:'¡'},
+];
+
+const LEVELS = {
+  noviceLow:{
+    id:'noviceLow',label:'Novice Low',emoji:'🌱',target:'3–10 words',
+    color:'green',tagline:'Individual words & memorized phrases',
+    guidelines:[
+      'Write single words or very short memorized phrases',
+      'Lists of vocabulary words are perfect at this level',
+      'Use words you have already learned in class',
+      'Aim for 3–10 words total — quality over quantity!',
+    ],
+    starters:['Me llamo…','Soy de…','Me gusta…','Tengo…','Mi … es…'],
+  },
+  noviceMid:{
+    id:'noviceMid',label:'Novice Mid',emoji:'🌿',target:'15–40 words',
+    color:'teal',tagline:'Simple phrases & short sentences',
+    guidelines:[
+      'Write 2–5 short, simple sentences using familiar patterns',
+      'Connect ideas with: y (and), pero (but), también (also), porque (because)',
+      'Use sentence starters from class — they are your building blocks!',
+      'Aim for 15–40 words total',
+    ],
+    starters:['Me llamo … y soy de…','En mi familia hay…','Me gusta … porque…','Todos los días yo…','Mi favorito/a es…'],
+  },
+};
+
+const UNITS = {
+  identity:   {label:'Identity & Greetings',emoji:'👋'},
+  family:     {label:'Family & Friends',emoji:'👨‍👩‍👧‍👦'},
+  school:     {label:'School Life',emoji:'🏫'},
+  food:       {label:'Food & Drink',emoji:'🍽️'},
+  home:       {label:'Home & Community',emoji:'🏡'},
+  body:       {label:'Body & Health',emoji:'💪'},
+  leisure:    {label:'Leisure & Culture',emoji:'⚽'},
+  nature:     {label:'Nature & Time',emoji:'🌦️'},
+  travel:     {label:'Travel & Places',emoji:'✈️'},
+  technology: {label:'Technology & Media',emoji:'📱'},
+};
+
+const PROMPTS = [
+  // ── NOVICE LOW ──────────────────────────────────────────────
+  {id:1,level:'noviceLow',unit:'identity',emoji:'👋',
+   title:'¡Hola! — Greetings & Introductions',
+   culturalTheme:'The Art of Greeting in the Spanish-Speaking World',
+   culturalFact:'In Spanish-speaking cultures, greetings are warm and personal. People say "buenos días" ☀️ (good morning), "buenas tardes" 🌤️ (good afternoon), or "buenas noches" 🌙 (good evening). In many Latin American countries, it is polite to greet every single person when entering a room — even strangers! Friends often greet each other with a kiss on the cheek. 🇲🇽🇨🇴🇦🇷🇪🇸',
+   culturalRegion:'Latin America & Spain',
+   writingTask:'Write your name, where you are from, and how old you are.',
+   scaffolding:[
+     {phrase:'Me llamo ___',meaning:'My name is ___'},
+     {phrase:'Soy de ___',meaning:'I am from ___'},
+     {phrase:'Tengo ___ años',meaning:'I am ___ years old'},
+     {phrase:'Mucho gusto',meaning:'Nice to meet you'},
+   ],
+   example:'Hola. Me llamo Carlos. Soy de Texas. Tengo catorce años.',
+   grammarTip:'💡 Names of languages and nationalities (español, americano) do NOT get a capital letter in Spanish. But names of people and places DO: Carlos, Texas.',
+  },
+  {id:2,level:'noviceLow',unit:'family',emoji:'👨‍👩‍👧‍👦',
+   title:'Mi Familia — My Family',
+   culturalTheme:'La Familia — Heart of Latin American Life',
+   culturalFact:'Family is everything in most Spanish-speaking cultures. Extended family — grandparents, aunts, uncles, cousins — often live together or very close by. In Mexico and Colombia, Sunday family meals are a sacred tradition 🍽️. In many homes, grandparents (los abuelos) play a huge role in raising children. The word for family gathering, "reunión familiar," happens far more often than in many other cultures!',
+   culturalRegion:'🇲🇽 Mexico · 🇨🇴 Colombia · 🇪🇸 Spain',
+   writingTask:'Write the names of 3–5 family members and their relationship to you.',
+   scaffolding:[
+     {phrase:'Mi madre se llama ___',meaning:"My mother's name is ___"},
+     {phrase:'Mi padre se llama ___',meaning:"My father's name is ___"},
+     {phrase:'Mi hermano / hermana',meaning:'My brother / sister'},
+     {phrase:'Mi abuela / abuelo',meaning:'My grandmother / grandfather'},
+     {phrase:'Tengo ___ hermanos',meaning:'I have ___ siblings'},
+   ],
+   example:'Mi madre se llama Rosa. Mi padre se llama Juan. Tengo dos hermanos.',
+   grammarTip:'💡 "Mi" = my (singular). Mi madre, mi padre. Use "mis" for plural things: mis hermanos = my siblings.',
+  },
+  {id:3,level:'noviceLow',unit:'food',emoji:'🍽️',
+   title:'La Comida — Foods I Like',
+   culturalTheme:'A Feast of Flavors Across the Spanish-Speaking World',
+   culturalFact:'Food is culture! 🌮 Mexico is famous for tacos, tamales, and mole. 🥘 Spain has paella — saffron rice with seafood. 🍋 Peru is known for ceviche. 🥩 Argentina loves asado (barbecue). Every country in the Spanish-speaking world has its own delicious traditions passed down through generations!',
+   culturalRegion:'🇲🇽 Mexico · 🇵🇪 Peru · 🇦🇷 Argentina · 🇪🇸 Spain',
+   writingTask:'Write 3–5 foods you like and 1–2 you do not like.',
+   scaffolding:[
+     {phrase:'Me gusta ___',meaning:'I like ___ (singular)'},
+     {phrase:'Me gustan los/las ___',meaning:'I like ___ (plural)'},
+     {phrase:'No me gusta ___',meaning:"I don't like ___"},
+     {phrase:'Mi comida favorita es ___',meaning:'My favorite food is ___'},
+   ],
+   example:'Me gusta el pollo. Me gustan los tacos. No me gusta el pescado. Mi comida favorita es la pizza.',
+   grammarTip:'💡 Use "me gusta" + singular: me gusta el arroz. Use "me gustan" + plural: me gustan los tacos.',
+  },
+  {id:4,level:'noviceLow',unit:'nature',emoji:'📅',
+   title:'Los Días y Los Meses — Days, Months & Dates',
+   culturalTheme:'How Spanish Speakers Mark Time',
+   culturalFact:'📅 In most Spanish-speaking countries, calendars start on MONDAY, not Sunday! Days of the week are NOT capitalized in Spanish: lunes, martes, miércoles… 🎂 In Mexico it is tradition to wake someone up with "Las Mañanitas" — a beautiful birthday song sung at dawn by family and friends!',
+   culturalRegion:'🇲🇽 Mexico · 🇨🇴 Colombia · 🇪🇸 Spain',
+   writingTask:"Write today's date, your birthday, and 2–3 of your favorite days or months.",
+   scaffolding:[
+     {phrase:'Hoy es ___ (día)',meaning:'Today is ___ (day)'},
+     {phrase:'Mi cumpleaños es el ___ de ___',meaning:'My birthday is the ___ of ___'},
+     {phrase:'Mi mes favorito es ___',meaning:'My favorite month is ___'},
+     {phrase:'Mi día favorito es el ___',meaning:'My favorite day is ___'},
+     {phrase:'lunes · martes · miércoles · jueves · viernes · sábado · domingo',meaning:'Mon · Tue · Wed · Thu · Fri · Sat · Sun'},
+   ],
+   example:'Hoy es martes. Mi cumpleaños es el cinco de mayo. Mi mes favorito es diciembre.',
+   grammarTip:'💡 Days and months are NOT capitalized in Spanish: lunes, enero. Dates use cardinal numbers EXCEPT the first: el primero de enero.',
+  },
+  {id:5,level:'noviceLow',unit:'nature',emoji:'🌈',
+   title:'Los Colores — Colors in My World',
+   culturalTheme:'The Vibrant Colors of Latin American Art',
+   culturalFact:'Color is everywhere in Latin American culture! 🎨 Frida Kahlo is famous worldwide for her bold, colorful self-portraits. 🏠 In Mexico, Cuba, and Colombia, houses are painted in brilliant blues, yellows, and pinks. Guanajuato, Mexico is nicknamed "the most colorful city in the world!"',
+   culturalRegion:'🇲🇽 Mexico · 🇨🇺 Cuba · 🇨🇴 Colombia',
+   writingTask:'Write your 3 favorite colors and describe 2–3 objects using a color word.',
+   scaffolding:[
+     {phrase:'Mi color favorito es ___',meaning:'My favorite color is ___'},
+     {phrase:'El/La ___ es ___',meaning:'The ___ is ___ (color)'},
+     {phrase:'rojo · azul · verde · amarillo',meaning:'red · blue · green · yellow'},
+     {phrase:'anaranjado · morado · rosado · negro · blanco · gris · marrón',meaning:'orange · purple · pink · black · white · gray · brown'},
+   ],
+   example:'Mi color favorito es el azul. El cielo es azul. Mi mochila es morada.',
+   grammarTip:'💡 Color adjectives must match the noun! "La mochila es roja" (feminine) but "El libro es rojo" (masculine). Verde and azul stay the same for both!',
+  },
+  {id:6,level:'noviceLow',unit:'school',emoji:'🎒',
+   title:'La Clase — My Classroom',
+   culturalTheme:'Schools Across the Spanish-Speaking World',
+   culturalFact:'🏫 In many Latin American countries, students wear uniforms every day! 📚 In Mexico, all public school textbooks are FREE and provided by the government — a tradition since 1960. In Spain, students typically stay at the same school from age 6 all the way to age 16.',
+   culturalRegion:'🇲🇽 Mexico · 🇨🇴 Colombia · 🇪🇸 Spain · 🇦🇷 Argentina',
+   writingTask:'Write 5–8 objects you find in your classroom or backpack.',
+   scaffolding:[
+     {phrase:'En mi clase hay ___',meaning:'In my class there is/are ___'},
+     {phrase:'En mi mochila tengo ___',meaning:'In my backpack I have ___'},
+     {phrase:'el lápiz · el bolígrafo · el cuaderno · el libro',meaning:'pencil · pen · notebook · book'},
+     {phrase:'la mochila · la regla · las tijeras · el papel',meaning:'backpack · ruler · scissors · paper'},
+     {phrase:'la computadora · el escritorio · la silla · la pizarra',meaning:'computer · desk · chair · board'},
+   ],
+   example:'En mi mochila tengo un lápiz, un cuaderno y un libro. En mi clase hay una pizarra y muchas sillas.',
+   grammarTip:'💡 Un = a/an (masculine): un lápiz. Una = a/an (feminine): una regla. Unos/Unas = some (plural).',
+  },
+  {id:7,level:'noviceLow',unit:'family',emoji:'🐾',
+   title:'Mis Mascotas — Pets & Animals',
+   culturalTheme:'Animals & Nature in the Spanish-Speaking World',
+   culturalFact:'🦋 Latin America is one of the most biodiverse regions on Earth! The Amazon rainforest is home to over 10% of all species on the planet. 🐦 Mexico is home to more than 1,000 species of birds! The quetzal bird 🦚 is so important to Guatemala that it is their national symbol AND the name of their currency.',
+   culturalRegion:'🇲🇽 Mexico · 🇨🇴 Colombia · 🇵🇪 Peru · 🇬🇹 Guatemala',
+   writingTask:'Write about your pet or an animal you like. Include name, type, and color.',
+   scaffolding:[
+     {phrase:'Tengo un/una ___',meaning:'I have a ___'},
+     {phrase:'No tengo mascota',meaning:"I don't have a pet"},
+     {phrase:'Mi mascota se llama ___',meaning:'My pet is named ___'},
+     {phrase:'Es ___ (color)',meaning:'It is ___ (color)'},
+     {phrase:'el perro · el gato · el pez · el pájaro · el conejo · el caballo',meaning:'dog · cat · fish · bird · rabbit · horse'},
+   ],
+   example:'Tengo un perro. Se llama Max. Es negro y blanco. Me gustan los perros porque son simpáticos.',
+   grammarTip:'💡 "Son" = they are (plural). "Es" = he/she/it is (singular). Max es negro. Los perros son simpáticos.',
+  },
+  {id:8,level:'noviceLow',unit:'home',emoji:'👗',
+   title:'La Ropa — Clothing',
+   culturalTheme:'Traditional Dress Across the Spanish-Speaking World',
+   culturalFact:'🪡 In Mexico, the "huipil" is a colorful handwoven blouse worn by indigenous women — each village has its own unique pattern. 💃 In Spain, the "traje de flamenca" is a ruffled dress worn during flamenco festivals. In Guatemala, woven textiles called "tejidos" are recognized by UNESCO as cultural heritage.',
+   culturalRegion:'🇲🇽 Mexico · 🇬🇹 Guatemala · 🇪🇸 Spain · 🇵🇪 Peru',
+   writingTask:'Write about 4–6 items of clothing you are wearing today or your favorite outfit.',
+   scaffolding:[
+     {phrase:'Hoy llevo ___',meaning:'Today I am wearing ___'},
+     {phrase:'Mi ropa favorita es ___',meaning:'My favorite clothing is ___'},
+     {phrase:'la camiseta · los pantalones · los zapatos · los tenis',meaning:'t-shirt · pants · shoes · sneakers'},
+     {phrase:'la sudadera · la chaqueta · la falda · los calcetines · el sombrero',meaning:'sweatshirt · jacket · skirt · socks · hat'},
+     {phrase:'Es/Son ___ (color)',meaning:'It is / They are ___ (color)'},
+   ],
+   example:'Hoy llevo una camiseta azul, pantalones negros y tenis blancos. También llevo una sudadera gris.',
+   grammarTip:'💡 "Llevar" = to wear. Yo llevo = I wear/am wearing. Many clothing items are always plural in Spanish: los zapatos, los pantalones.',
+  },
+  {id:9,level:'noviceLow',unit:'nature',emoji:'🌤️',
+   title:'El Tiempo — The Weather',
+   culturalTheme:'Incredible Weather & Climates of the Spanish-Speaking World',
+   culturalFact:'🌍 Spanish-speaking countries have some of the world\'s most extreme climates! ❄️ Argentina\'s Patagonia is one of the windiest places on Earth. 🌵 The Atacama Desert in Chile is the driest desert in the world. ☀️ Puerto Rico and Cuba enjoy warm tropical weather almost all year.',
+   culturalRegion:'🇦🇷 Argentina · 🇨🇱 Chile · 🇵🇷 Puerto Rico · 🇪🇨 Ecuador',
+   writingTask:"Describe today's weather and the weather in your favorite season.",
+   scaffolding:[
+     {phrase:'Hoy hace ___ (calor / frío / sol / viento)',meaning:'Today it is ___ (hot / cold / sunny / windy)'},
+     {phrase:'Hoy está nublado / lluvioso',meaning:'Today it is cloudy / rainy'},
+     {phrase:'Llueve / Nieva / Hace sol',meaning:'It rains / It snows / It is sunny'},
+     {phrase:'En el invierno/verano/otoño/primavera…',meaning:'In winter/summer/fall/spring…'},
+     {phrase:'Me gusta cuando hace ___',meaning:'I like it when it is ___'},
+   ],
+   example:'Hoy hace frío y está nublado. En el verano hace calor y hace sol. Me gusta cuando hace sol.',
+   grammarTip:'💡 Most weather uses "hacer": hace calor, hace frío, hace sol, hace viento. But: llueve (it rains), nieva (it snows). "Estar" is used for: está nublado.',
+  },
+  {id:10,level:'noviceLow',unit:'identity',emoji:'🔢',
+   title:'Los Números — Numbers & Quantities',
+   culturalTheme:'Numbers & Markets in Latin America',
+   culturalFact:'🛒 Markets (mercados) are the heart of shopping in most Latin American cities! At a mercado you negotiate prices directly with vendors — knowing your numbers in Spanish is ESSENTIAL! 🇲🇽 Mexico City\'s Mercado de Jamaica is the largest flower market in the world.',
+   culturalRegion:'🇲🇽 Mexico · 🇵🇪 Peru · 🇨🇴 Colombia',
+   writingTask:'Write your age, phone number, address number, and 3–5 quantities of things you own.',
+   scaffolding:[
+     {phrase:'Tengo ___ años',meaning:'I am ___ years old'},
+     {phrase:'Tengo ___ (libros / amigos / mascotas)',meaning:'I have ___ (books / friends / pets)'},
+     {phrase:'Mi número de teléfono es ___',meaning:'My phone number is ___'},
+     {phrase:'uno, dos, tres… diez, once, doce…',meaning:'one, two, three… ten, eleven, twelve…'},
+     {phrase:'veinte, treinta, cuarenta, cincuenta…cien',meaning:'20, 30, 40, 50…100'},
+   ],
+   example:'Tengo catorce años. Tengo dos mascotas y tres libros de español. Tengo doce lápices en mi mochila.',
+   grammarTip:'💡 "Uno" becomes "un" before masculine nouns: un libro. Numbers 16–29 are written as one word: dieciséis, veintiuno.',
+  },
+  // ── NOVICE MID ──────────────────────────────────────────────
+  {id:11,level:'noviceMid',unit:'identity',emoji:'📅',
+   title:'Mi Rutina Diaria — My Daily Routine',
+   culturalTheme:'A Day in the Life in the Spanish-Speaking World',
+   culturalFact:'Daily schedules can look very different! 🇪🇸 In Spain and parts of Latin America, there is a long lunch break (2–4 PM) where families go home to eat together. Dinner in Spain is often eaten at 9 or 10 PM! In Mexico City, school often starts at 7 AM and ends at 2 PM.',
+   culturalRegion:'🇪🇸 Spain · 🇲🇽 Mexico · 🇨🇱 Chile',
+   writingTask:'Describe your typical school day from morning to afternoon. What do you do?',
+   scaffolding:[
+     {phrase:'Por la mañana, yo ___',meaning:'In the morning, I ___'},
+     {phrase:'Voy a la escuela a las ___',meaning:'I go to school at ___'},
+     {phrase:'En la escuela, yo ___',meaning:'At school, I ___'},
+     {phrase:'Por la tarde, yo ___',meaning:'In the afternoon, I ___'},
+     {phrase:'Por la noche, yo ___',meaning:'In the evening, I ___'},
+   ],
+   example:'Por la mañana, yo como el desayuno. Voy a la escuela a las ocho. En la escuela, yo estudio español y matemáticas. Por la tarde, yo hago la tarea.',
+   grammarTip:'💡 Regular -AR verbs with "yo": yo como (I eat), yo estudio (I study), yo hablo (I speak). The "yo" form almost always ends in -o!',
+  },
+  {id:12,level:'noviceMid',unit:'leisure',emoji:'⚽',
+   title:'Los Deportes — Sports & Activities',
+   culturalTheme:'Fútbol: The Passion of the Spanish-Speaking World',
+   culturalFact:'Fútbol (soccer) is more than a sport — it is a way of life! 🏆 Argentina has produced legends like Lionel Messi. Spain won the World Cup in 2010. On game days in Mexico City or Buenos Aires, streets become completely quiet as everyone gathers around a TV. The famous "¡GOOOL!" chant is recognized worldwide.',
+   culturalRegion:'🇦🇷 Argentina · 🇲🇽 Mexico · 🇨🇴 Colombia · 🇪🇸 Spain',
+   writingTask:'Write about a sport or activity you enjoy. Why do you like it? When and with whom do you play?',
+   scaffolding:[
+     {phrase:'Me gusta ___ porque ___',meaning:'I like ___ because ___'},
+     {phrase:'Yo juego al ___',meaning:'I play ___'},
+     {phrase:'Juego los ___ (días)',meaning:'I play on ___days'},
+     {phrase:'Es divertido / difícil / emocionante',meaning:"It's fun / difficult / exciting"},
+     {phrase:'Juego con mis amigos / mi equipo',meaning:'I play with my friends / my team'},
+   ],
+   example:'Me gusta el fútbol porque es muy divertido. Yo juego al fútbol los sábados con mis amigos. También me gusta el básquetbol.',
+   grammarTip:'💡 "Jugar" = to play (sports). Use jugar + AL + sport: juego al fútbol. "También" = also/too.',
+  },
+  {id:13,level:'noviceMid',unit:'leisure',emoji:'🎉',
+   title:'Las Fiestas — Holidays & Celebrations',
+   culturalTheme:'Vibrant Festivals of the Spanish-Speaking World',
+   culturalFact:'🪦🌼 El Día de los Muertos (Nov. 1–2) in Mexico is a joyful celebration of loved ones who have passed. Families build colorful altars (ofrendas) with food, candles, and marigold flowers — it is NOT sad, it is a reunion! 🕯️ Las Posadas (Dec. 16–24) reenact Mary and Joseph\'s search for shelter with candlelit processions and piñatas.',
+   culturalRegion:'🇲🇽 Mexico · 🇪🇸 Spain · 🇬🇹 Guatemala',
+   writingTask:'Describe your favorite holiday or celebration. What do you do? Who do you celebrate with? What do you eat?',
+   scaffolding:[
+     {phrase:'Mi fiesta favorita es ___',meaning:'My favorite holiday is ___'},
+     {phrase:'Celebro con mi familia / mis amigos',meaning:'I celebrate with my family / friends'},
+     {phrase:'Nosotros comemos ___ y bebemos ___',meaning:'We eat ___ and drink ___'},
+     {phrase:'Es una fiesta muy ___',meaning:"It's a very ___ celebration"},
+     {phrase:'especial · divertida · importante · bonita',meaning:'special · fun · important · beautiful'},
+   ],
+   example:'Mi fiesta favorita es la Navidad. Celebro con mi familia. Nosotros comemos tamales y bebemos ponche. Es una fiesta muy especial y bonita.',
+   grammarTip:'💡 Nosotros = we. For -AR verbs, "nosotros" ends in -amos: celebramos. For -ER verbs: -emos: comemos.',
+  },
+  {id:14,level:'noviceMid',unit:'school',emoji:'🏫',
+   title:'Mis Clases — School Subjects & Schedule',
+   culturalTheme:'Education in the Spanish-Speaking World',
+   culturalFact:'📚 In many Latin American countries, students go to school from 7 AM to 2 PM — no afternoon classes! 🎓 Cuba has one of the highest literacy rates in the world (nearly 100%). Art, music, and physical education are often just as important as math and science in Latin American schools!',
+   culturalRegion:'🇲🇽 Mexico · 🇨🇺 Cuba · 🇪🇸 Spain · 🇨🇴 Colombia',
+   writingTask:'Describe your school schedule. What classes do you have? Which do you like or dislike? Why?',
+   scaffolding:[
+     {phrase:'Tengo la clase de ___',meaning:'I have ___ class'},
+     {phrase:'Mi clase favorita es ___',meaning:'My favorite class is ___'},
+     {phrase:'No me gusta ___ porque es ___',meaning:"I don't like ___ because it is ___"},
+     {phrase:'el español · las matemáticas · las ciencias · la historia',meaning:'Spanish · math · science · history'},
+     {phrase:'el arte · la música · la educación física · el inglés',meaning:'art · music · P.E. · English'},
+     {phrase:'fácil · difícil · aburrido · interesante · divertido',meaning:'easy · hard · boring · interesting · fun'},
+   ],
+   example:'Tengo la clase de español, matemáticas y ciencias. Mi clase favorita es el arte porque es muy divertida. No me gusta la historia porque es aburrida.',
+   grammarTip:'💡 Adjectives must agree: la historia es aburrida (f). el español es interesante (m). Add -a for feminine, -o for masculine.',
+  },
+  {id:15,level:'noviceMid',unit:'identity',emoji:'🪞',
+   title:'Mi Descripción Física — Physical Description',
+   culturalTheme:'Beauty Standards & Identity in Latin America',
+   culturalFact:'🎨 The Mexican muralist Diego Rivera painted people of all shapes, sizes, and skin tones as beautiful and powerful. 🖼️ Frida Kahlo challenged traditional beauty standards through her art, embracing her indigenous heritage and unique appearance.',
+   culturalRegion:'🇲🇽 Mexico · 🇨🇺 Cuba · 🇨🇴 Colombia',
+   writingTask:'Describe yourself — your hair, eyes, height, and one or two other physical features.',
+   scaffolding:[
+     {phrase:'Soy alto/a · bajo/a · mediano/a',meaning:'I am tall · short · average height'},
+     {phrase:'Tengo el pelo ___',meaning:'I have ___ hair'},
+     {phrase:'Tengo los ojos ___',meaning:'I have ___ eyes'},
+     {phrase:'rubio · moreno · castaño · negro · rizado · lacio',meaning:'blond · dark · brown · black · curly · straight (hair)'},
+     {phrase:'azules · verdes · marrones · negros · grises',meaning:'blue · green · brown · black · grey (eyes)'},
+   ],
+   example:'Soy mediana y tengo el pelo castaño y lacio. Tengo los ojos verdes. También tengo pecas.',
+   grammarTip:'💡 "Ser" is for permanent physical traits: soy alta. "Tener" is for features you "have": tengo el pelo rubio. Remember gender: soy alto (boy) / soy alta (girl).',
+  },
+  {id:16,level:'noviceMid',unit:'identity',emoji:'😊',
+   title:'Mi Personalidad — Personality Traits',
+   culturalTheme:'Character & Values in Spanish-Speaking Cultures',
+   culturalFact:'🤝 Hospitality (la hospitalidad) is one of the most valued traits in Latin American culture. Guests are always offered food and drink. The concept of "simpatía" — being warm, friendly, and harmonious — is deeply valued across Latin America and Spain.',
+   culturalRegion:'🇨🇴 Colombia · 🇲🇽 Mexico · 🇩🇴 Dominican Republic',
+   writingTask:'Describe your personality. What are you like? Write 3–5 sentences about your character and traits.',
+   scaffolding:[
+     {phrase:'Soy muy ___',meaning:'I am very ___'},
+     {phrase:'No soy ___',meaning:'I am not ___'},
+     {phrase:'A veces soy ___',meaning:'Sometimes I am ___'},
+     {phrase:'simpático/a · amable · divertido/a · serio/a · inteligente',meaning:'friendly · kind · funny · serious · intelligent'},
+     {phrase:'trabajador/a · creativo/a · tímido/a · extrovertido/a · responsable',meaning:'hardworking · creative · shy · outgoing · responsible'},
+   ],
+   example:'Soy muy trabajadora y creativa. También soy simpática. A veces soy tímida, pero con mis amigos soy muy divertida. No soy seria.',
+   grammarTip:'💡 Most personality adjectives change ending: simpático (m) / simpática (f). Some don\'t change: inteligente, responsable. "A veces" = sometimes.',
+  },
+  {id:17,level:'noviceMid',unit:'home',emoji:'🏠',
+   title:'Mi Casa — My Home & Rooms',
+   culturalTheme:'Homes & Architecture in the Spanish-Speaking World',
+   culturalFact:'🏡 In Mexico, many traditional homes are built around a central open courtyard called a "patio." 🇨🇺 In Cuba, colorful colonial homes with tall ceilings line the streets of Havana. 🇪🇸 In Spain, many people live in apartments (pisos).',
+   culturalRegion:'🇲🇽 Mexico · 🇨🇺 Cuba · 🇪🇸 Spain · 🇵🇪 Peru',
+   writingTask:'Describe your home. What rooms do you have? Describe your favorite room and what is in it.',
+   scaffolding:[
+     {phrase:'Mi casa tiene ___',meaning:'My house has ___'},
+     {phrase:'En mi casa hay ___',meaning:'In my house there is/are ___'},
+     {phrase:'Mi cuarto favorito es ___',meaning:'My favorite room is ___'},
+     {phrase:'la cocina · la sala · el dormitorio · el baño · el jardín',meaning:'kitchen · living room · bedroom · bathroom · garden'},
+     {phrase:'En mi cuarto hay ___',meaning:'In my room there is/are ___'},
+   ],
+   example:'Mi casa tiene tres dormitorios, una cocina y dos baños. Mi cuarto favorito es mi dormitorio. En mi dormitorio hay una cama, una computadora y muchos libros.',
+   grammarTip:'💡 "Hay" = there is / there are (one word for both!). It does NOT change for singular or plural: hay un libro, hay muchos libros.',
+  },
+  {id:18,level:'noviceMid',unit:'home',emoji:'🏙️',
+   title:'Mi Comunidad — Places in My Town',
+   culturalTheme:'City Life Across the Spanish-Speaking World',
+   culturalFact:'🏙️ Mexico City is one of the largest cities in the world, with over 21 million people. 🇦🇷 Buenos Aires is called "the Paris of South America." In most Spanish-speaking cities, the "plaza central" (town square) is the heart of community life.',
+   culturalRegion:'🇲🇽 Mexico City · 🇦🇷 Buenos Aires · 🇪🇸 Madrid · 🇨🇴 Bogotá',
+   writingTask:'Describe your town or city. What places are there? What do you do there and with whom?',
+   scaffolding:[
+     {phrase:'En mi ciudad / pueblo hay ___',meaning:'In my city / town there is/are ___'},
+     {phrase:'Yo voy al/a la ___ con ___',meaning:'I go to the ___ with ___'},
+     {phrase:'el parque · la biblioteca · el supermercado · la iglesia',meaning:'park · library · supermarket · church'},
+     {phrase:'el restaurante · la escuela · el cine · el hospital · la tienda',meaning:'restaurant · school · cinema · hospital · store'},
+     {phrase:'Me gusta ir a ___ porque ___',meaning:'I like to go to ___ because ___'},
+   ],
+   example:'En mi ciudad hay un parque, una biblioteca y muchos restaurantes. Yo voy al parque con mis amigos los fines de semana. Me gusta ir a la biblioteca porque es tranquila.',
+   grammarTip:'💡 "Ir a" = to go to. "Al" = a + el (must contract): voy al parque. But "a la" stays separate: voy a la tienda.',
+  },
+  {id:19,level:'noviceMid',unit:'identity',emoji:'😄',
+   title:'Mis Emociones — Emotions & Feelings',
+   culturalTheme:'Expressing Feelings in the Spanish-Speaking World',
+   culturalFact:'🎭 Latin American cultures are often described as emotionally expressive! 🇨🇴 Colombia ranks among the happiest countries in the world in global surveys. 🇦🇷 Tango from Argentina is a powerful expression of longing, passion, and emotion through movement.',
+   culturalRegion:'🇨🇴 Colombia · 🇦🇷 Argentina · 🇩🇴 Dominican Republic',
+   writingTask:'Write about how you feel today, how you feel at school, and when you feel your best.',
+   scaffolding:[
+     {phrase:'Hoy estoy ___',meaning:'Today I am / feel ___'},
+     {phrase:'Cuando tengo un examen, estoy ___',meaning:'When I have a test, I feel ___'},
+     {phrase:'Estoy feliz / triste / enojado(a) / cansado(a)',meaning:'I am happy / sad / angry / tired'},
+     {phrase:'Estoy nervioso/a · emocionado/a · aburrido/a · sorprendido/a',meaning:'I am nervous · excited · bored · surprised'},
+     {phrase:'Me siento bien / mal / así así',meaning:'I feel good / bad / so-so'},
+   ],
+   example:'Hoy estoy muy feliz porque es viernes. En la clase de matemáticas, estoy nervioso. Me siento bien cuando estoy con mis amigos.',
+   grammarTip:'💡 "Estar" is used for emotions (temporary): estoy feliz, estás cansado. NOT "ser." Remember: ser = permanent traits, estar = feelings & conditions.',
+  },
+  {id:20,level:'noviceMid',unit:'home',emoji:'🛍️',
+   title:'Las Compras — Shopping for Clothes',
+   culturalTheme:'Markets & Shopping Culture in Latin America',
+   culturalFact:'🛒 Shopping in Latin America is a social experience! 🇲🇽 In Mexican markets (mercados), you can buy everything while chatting with vendors. In most Latin American markets, prices are negotiable — bargaining (regatear) is expected and even enjoyable!',
+   culturalRegion:'🇲🇽 Mexico · 🇬🇹 Guatemala · 🇨🇴 Colombia · 🇵🇪 Peru',
+   writingTask:'Write about a shopping trip. What do you want to buy? Where do you go? How much does it cost?',
+   scaffolding:[
+     {phrase:'Quiero comprar ___',meaning:'I want to buy ___'},
+     {phrase:'Voy a la tienda / al mercado / al centro comercial',meaning:'I go to the store / market / mall'},
+     {phrase:'¿Cuánto cuesta(n)? / Cuesta(n) ___',meaning:'How much does it/do they cost?'},
+     {phrase:'Es barato/a · caro/a · perfecto/a',meaning:"It's cheap · expensive · perfect"},
+     {phrase:'Lo/La compro',meaning:'I buy it'},
+   ],
+   example:'Quiero comprar una chaqueta y unos tenis. Voy al centro comercial con mi mamá. La chaqueta cuesta veinte dólares. ¡Es muy barata! La compro.',
+   grammarTip:'💡 "Querer" = to want (stem-changing: yo quiero, tú quieres). The stem changes from e → ie. Another e→ie verb you know: tener → yo tengo (irregular), tú tienes.',
+  },
+  {id:21,level:'noviceMid',unit:'travel',emoji:'✈️',
+   title:'Los Viajes — Travel & Transportation',
+   culturalTheme:'Getting Around the Spanish-Speaking World',
+   culturalFact:'🚌 Transportation in Latin America is colorful and unique! 🇨🇴 In Colombia, a "chiva" is a brightly painted bus decorated with flowers and murals. 🚕 In Cuba, 1950s American cars serve as taxis, making Havana look like a vintage car museum.',
+   culturalRegion:'🇨🇴 Colombia · 🇨🇺 Cuba · 🇪🇨 Ecuador · 🇦🇷 Argentina',
+   writingTask:'Describe a trip you have taken or a place you want to visit. How do you get there? What do you see?',
+   scaffolding:[
+     {phrase:'Quiero ir / Fui a ___',meaning:'I want to go / I went to ___'},
+     {phrase:'Voy en avión / en carro / en autobús / en tren',meaning:'I go by plane / car / bus / train'},
+     {phrase:'El lugar es ___ (bonito / interesante / famoso)',meaning:'The place is ___ (pretty / interesting / famous)'},
+     {phrase:'Quiero ver / visitar ___',meaning:'I want to see / visit ___'},
+     {phrase:'Hay muchos/muchas ___ allí',meaning:'There are many ___ there'},
+   ],
+   example:'Quiero ir a México. Voy en avión con mi familia. México es un país muy bonito e interesante. Quiero ver las pirámides y comer tacos.',
+   grammarTip:'💡 "Quiero" + infinitive = I want to + verb: quiero ir, quiero ver, quiero comer. The second verb always stays in the infinitive (-ar/-er/-ir form)!',
+  },
+  {id:22,level:'noviceMid',unit:'leisure',emoji:'🎵',
+   title:'La Música y las Artes — Music & Arts',
+   culturalTheme:'The Musical Soul of the Spanish-Speaking World',
+   culturalFact:'🎶 Music is everywhere in Latin culture! 💃 Salsa originated in the Caribbean, mixing African rhythms with Spanish melodies. 🇦🇷 Tango from Argentina is a UNESCO Intangible Cultural Heritage. 🎺 Reggaeton, which started in Puerto Rico, is now one of the most-streamed music genres in the world!',
+   culturalRegion:'🇨🇴 Colombia · 🇦🇷 Argentina · 🇲🇽 Mexico · 🇵🇷 Puerto Rico',
+   writingTask:'Write about your favorite type of music, a song, or a movie. Why do you like it? How do you feel when you listen or watch?',
+   scaffolding:[
+     {phrase:'Me gusta escuchar ___ porque ___',meaning:'I like to listen to ___ because ___'},
+     {phrase:'Mi género favorito es ___',meaning:'My favorite genre is ___'},
+     {phrase:'Me gusta la película / la canción ___',meaning:'I like the movie / song ___'},
+     {phrase:'Cuando escucho ___, me siento ___',meaning:'When I listen to ___, I feel ___'},
+     {phrase:'la música pop · el rap · el rock · la música latina · el reggaeton',meaning:'pop · rap · rock · Latin music · reggaeton'},
+   ],
+   example:'Me gusta escuchar música pop porque es muy animada. Mi género favorito es el pop. También me gusta el reggaeton. Cuando escucho música, estoy muy feliz.',
+   grammarTip:'💡 "Escuchar" = to listen to. In Spanish you do NOT need extra words after escuchar: "escucho música" not "escucho a la música."',
+  },
+  {id:23,level:'noviceMid',unit:'technology',emoji:'📱',
+   title:'La Tecnología — Technology & Social Media',
+   culturalTheme:'Technology & Youth Culture in Latin America',
+   culturalFact:'📱 Latin American youth are among the most active social media users in the world! WhatsApp is the #1 messaging app in nearly every Spanish-speaking country. 🇺🇾 Uruguay became the first country in the world to give every student a free laptop through its Plan Ceibal program!',
+   culturalRegion:'🇲🇽 Mexico · 🇦🇷 Argentina · 🇺🇾 Uruguay · 🇨🇱 Chile',
+   writingTask:'Write about how you use technology. What apps or devices do you use? How much time do you spend online?',
+   scaffolding:[
+     {phrase:'Uso mi teléfono / computadora / tableta para ___',meaning:'I use my phone / computer / tablet to ___'},
+     {phrase:'Me gusta usar ___ (la app)',meaning:'I like to use ___ (the app)'},
+     {phrase:'Paso ___ horas en / usando ___',meaning:'I spend ___ hours on / using ___'},
+     {phrase:'Escucho música / Veo videos / Mando mensajes / Juego videojuegos',meaning:'I listen to music / watch videos / send messages / play video games'},
+     {phrase:'En mi opinión, la tecnología es ___',meaning:'In my opinion, technology is ___'},
+   ],
+   example:'Uso mi teléfono para escuchar música y mandar mensajes. Me gusta usar Instagram y YouTube. Paso dos horas cada día usando mi teléfono. En mi opinión, la tecnología es muy útil.',
+   grammarTip:'💡 "Para" + infinitive = in order to: uso mi teléfono para escuchar música. "Cada día" = every day, "cada semana" = every week.',
+  },
+  {id:24,level:'noviceMid',unit:'body',emoji:'💪',
+   title:'Mi Salud — Health & Body Parts',
+   culturalTheme:'Health & Wellness in the Spanish-Speaking World',
+   culturalFact:'🌿 Traditional medicine is deeply respected in Latin America. In Mexico and Peru, "curanderos" (traditional healers) use plants and herbs to treat illness. 🫖 "Té de manzanilla" (chamomile tea) is the go-to remedy for stomachaches across Latin America.',
+   culturalRegion:'🇲🇽 Mexico · 🇵🇪 Peru · 🇨🇺 Cuba · 🇧🇴 Bolivia',
+   writingTask:'Write about how you stay healthy. What do you eat? Do you exercise? How do you feel when you are sick?',
+   scaffolding:[
+     {phrase:'Para estar sano/a, yo ___',meaning:'To be healthy, I ___'},
+     {phrase:'Como ___ y bebo ___',meaning:'I eat ___ and drink ___'},
+     {phrase:'Hago ejercicio / Camino / Duermo ___ horas',meaning:'I exercise / walk / sleep ___ hours'},
+     {phrase:'Cuando estoy enfermo/a, me duele ___',meaning:'When I am sick, my ___ hurts'},
+     {phrase:'la cabeza · el estómago · la garganta · la espalda · el pie',meaning:'head · stomach · throat · back · foot'},
+   ],
+   example:'Para estar sana, como frutas y verduras y bebo mucha agua. Hago ejercicio tres veces a la semana. Cuando estoy enferma, me duele la garganta y duermo mucho.',
+   grammarTip:'💡 "Me duele" = it hurts me (singular): me duele la cabeza. "Me duelen" = they hurt me (plural): me duelen los pies. Just like me gusta / me gustan!',
+  },
+  {id:25,level:'noviceMid',unit:'nature',emoji:'🌸',
+   title:'Las Estaciones y la Naturaleza — Seasons & Nature',
+   culturalTheme:'The Natural Wonders of the Spanish-Speaking World',
+   culturalFact:'🌍 Spanish-speaking countries have some of Earth\'s most breathtaking wonders! 🏔️ The Andes Mountains stretch through 7 South American countries. 🌺 Costa Rica has more biodiversity per square kilometer than almost anywhere on Earth, and 25% of its land is protected national park.',
+   culturalRegion:'🇪🇨 Ecuador · 🇦🇷 Argentina · 🇨🇷 Costa Rica · 🇨🇱 Chile',
+   writingTask:'Describe your favorite season and what you like to do outside. What is nature like where you live?',
+   scaffolding:[
+     {phrase:'Mi estación favorita es ___ porque ___',meaning:'My favorite season is ___ because ___'},
+     {phrase:'En el verano / invierno / otoño / primavera…',meaning:'In summer / winter / fall / spring…'},
+     {phrase:'Me gusta ___ (actividad) cuando hace ___',meaning:'I like to ___ when it is ___'},
+     {phrase:'En mi ciudad / estado hay ___ (montañas · ríos · playas · bosques)',meaning:'In my city / state there are ___ (mountains · rivers · beaches · forests)'},
+     {phrase:'La naturaleza aquí es ___',meaning:'Nature here is ___'},
+   ],
+   example:'Mi estación favorita es la primavera porque hace sol y no hace mucho calor. Me gusta caminar en el parque cuando hace buen tiempo. En mi ciudad hay un río y muchos árboles. La naturaleza aquí es muy bonita.',
+   grammarTip:'💡 "Hacer buen / mal tiempo" = the weather is nice / bad. "Voy a + infinitive" = going to (near future): voy a nadar este verano.',
+  },
+];
+
+// ── PDF generator ───────────────────────────────────────────────
+function buildPdfHtml({studentName,period,prompt,level,writingText,feedback}){
+  const date = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const corrections = feedback?.improvements?.map(imp=>
+    `<tr>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;color:#dc2626;text-decoration:line-through">${imp.studentText||'—'}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;color:#16a34a;font-weight:600">${imp.correction||'—'}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;color:#555;font-size:13px">${imp.explanation||''}</td>
+    </tr>`
+  ).join('')||'';
+  return `<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"/>
+<title>Taller de Escritura – ${studentName}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;color:#1a1a1a;padding:40px;max-width:760px;margin:auto}
+.hdr{background:linear-gradient(135deg,#b91c1c,#d97706);color:white;border-radius:14px;padding:28px 32px;margin-bottom:28px}
+.hdr-top{display:flex;justify-content:space-between;align-items:flex-start}
+.logo{font-size:26px;font-weight:700}
+.sub{font-size:13px;opacity:.85;margin-top:3px}
+.meta{text-align:right;font-size:13px;opacity:.85}
+.badge{display:inline-block;background:rgba(255,255,255,.25);border-radius:20px;padding:4px 14px;font-size:12px;font-weight:600;margin-top:6px}
+.sec{background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:20px 24px;margin-bottom:20px}
+.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:12px}
+.writing-box{background:#fff;border:2px solid #d1fae5;border-radius:10px;padding:18px 22px;font-size:15px;line-height:1.7;font-style:italic}
+.corrected-box{background:#fff;border:2px solid #a7f3d0;border-radius:10px;padding:18px 22px;font-size:15px;line-height:1.7;font-weight:600}
+.strengths{list-style:none}.strengths li{padding:6px 0;font-size:14px;color:#166534;display:flex;gap:10px}
+.strengths li::before{content:"✓";font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f3f4f6;padding:10px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280}
+.encourage{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:16px 20px;text-align:center;font-size:15px;font-weight:600;color:#92400e;margin-bottom:20px}
+.cultural{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px 18px;font-size:13px;color:#9a3412;margin-bottom:20px}
+.footer{text-align:center;font-size:12px;color:#9ca3af;margin-top:32px;border-top:1px solid #e5e7eb;padding-top:16px}
+</style></head><body>
+<div class="hdr"><div class="hdr-top">
+<div><div class="logo">✍️ Seño Bluemel</div><div class="sub">Taller de Escritura · Spanish Writing Lab</div><div class="badge">${level.emoji} ${level.label} · ACTFL</div></div>
+<div class="meta"><strong>${studentName||'Student'}</strong><br/>${period?'Period '+period+'<br/>':''}${date}</div>
+</div></div>
+<div class="sec"><div class="sec-title">📝 Writing Prompt</div>
+<p style="font-size:14px;color:#374151">${prompt.emoji} <strong>${prompt.title}</strong> — ${prompt.writingTask}</p></div>
+<div class="sec"><div class="sec-title">✍️ My Writing</div><div class="writing-box">${writingText}</div></div>
+${feedback?.strengths?.length?`<div class="sec"><div class="sec-title" style="color:#15803d">🌟 What I Did Well</div><ul class="strengths">${feedback.strengths.map(s=>`<li>${s}</li>`).join('')}</ul></div>`:''}
+${corrections?`<div class="sec"><div class="sec-title" style="color:#1d4ed8">📚 Corrections</div><table><thead><tr><th>My Writing</th><th>Corrected</th><th>Explanation</th></tr></thead><tbody>${corrections}</tbody></table></div>`:''}
+${feedback?.correctedVersion?`<div class="sec"><div class="sec-title" style="color:#065f46">✅ Polished Version</div><div class="corrected-box">${feedback.correctedVersion}</div></div>`:''}
+${feedback?.culturalNote?`<div class="cultural">🌍 <strong>Cultural Connection:</strong> ${feedback.culturalNote}</div>`:''}
+${feedback?.encouragement?`<div class="encourage">🎉 ${feedback.encouragement}</div>`:''}
+<div class="footer">Seño Bluemel Taller de Escritura · Generated ${date}</div>
+</body></html>`;
+}
+
+// ── API Key Setup Screen ────────────────────────────────────────
+function ApiKeySetup({onSave}){
+  const [key,setKey] = React.useState('');
+  const [err,setErr] = React.useState('');
+  const save = () => {
+    if(!key.trim().startsWith('sk-ant-')){ setErr('Please enter a valid Anthropic API key (starts with sk-ant-…)'); return; }
+    localStorage.setItem('taller_api_key', key.trim());
+    onSave(key.trim());
+  };
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8">
+        <div className="text-center mb-6">
+          <div className="text-5xl mb-3">✍️</div>
+          <h1 className="text-2xl font-bold text-gray-900">Seño Bluemel</h1>
+          <p className="text-gray-500 text-sm mt-1">Taller de Escritura · Spanish Writing Lab</p>
+        </div>
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5 text-sm text-amber-800">
+          <strong>🔑 One-time Setup:</strong> Enter your Anthropic API key to enable AI feedback. The key is saved on this device only.
+        </div>
+        <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">Anthropic API Key</label>
+        <input
+          type="password" value={key} onChange={e=>{setKey(e.target.value);setErr('');}}
+          placeholder="sk-ant-..."
+          className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-400 mb-2"
+        />
+        {err && <p className="text-red-600 text-xs mb-3">{err}</p>}
+        <button onClick={save} className="w-full bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold py-3 rounded-xl hover:opacity-90 transition-opacity mt-1">
+          Save & Start Writing
+        </button>
+        <p className="text-xs text-gray-400 text-center mt-4">
+          Get your key at <strong>console.anthropic.com</strong> · It's only stored on this device
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── Share / PDF Modal ───────────────────────────────────────────
+function ShareModal({studentName,prompt,level,writingText,feedback,onClose}){
+  const [name,setName] = React.useState(studentName||'');
+  const [period,setPeriod] = React.useState('');
+  const [copied,setCopied] = React.useState(false);
+  const [downloaded,setDownloaded] = React.useState(false);
+
+  const summary = `--- Seño Bluemel Taller de Escritura ---
+Student: ${name||'(name)'}   Period: ${period||'(period)'}
+Level: ${level.label}   Prompt: ${prompt.title}
+Date: ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}
+
+MY WRITING:
+${writingText}
+${feedback?.correctedVersion?`\nPOLISHED VERSION:\n${feedback.correctedVersion}`:''}
+${feedback?.strengths?.length?`\nSTRENGTHS:\n${feedback.strengths.map(s=>'• '+s).join('\n')}`:''}
+${feedback?.improvements?.length?`\nCORRECTIONS:\n${feedback.improvements.map(i=>`• ${i.studentText||''} → ${i.correction||''}: ${i.explanation||''}`).join('\n')}`:''}
+${feedback?.encouragement?`\n${feedback.encouragement}`:''}
+--- Taller de Escritura ---`;
+
+  const downloadPdf = ()=>{
+    const html = buildPdfHtml({studentName:name,period,prompt,level,writingText,feedback});
+    const blob = new Blob([html],{type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url,'_blank');
+    if(win){ win.onload=()=>{ win.focus(); win.print(); setDownloaded(true); }; }
+  };
+
+  const emailLink = ()=>{
+    const subject = encodeURIComponent(`Taller de Escritura – ${name} – ${prompt.title}`);
+    const body = encodeURIComponent(summary);
+    window.open(`mailto:?subject=${subject}&body=${body}`);
+  };
+
+  const copyText = ()=>{
+    navigator.clipboard.writeText(summary).then(()=>{ setCopied(true); setTimeout(()=>setCopied(false),2500); });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" onClick={e=>e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-5">
+          <div><h2 className="text-lg font-bold text-gray-900">📤 Share Your Work</h2>
+            <p className="text-xs text-gray-500 mt-0.5">Submit to Seño Bluemel</p></div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none">×</button>
+        </div>
+        <div className="space-y-3 mb-5">
+          <div>
+            <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide block mb-1">Your Name</label>
+            <input value={name} onChange={e=>setName(e.target.value)} placeholder="First and last name"
+              className="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400"/>
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide block mb-1">Class Period</label>
+            <input value={period} onChange={e=>setPeriod(e.target.value)} placeholder="e.g., Period 3"
+              className="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-400"/>
+          </div>
+        </div>
+        <div className="space-y-2.5">
+          <button onClick={downloadPdf} className="w-full flex items-center gap-3 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-xl px-4 py-3 font-semibold text-sm hover:opacity-90 transition-opacity shadow">
+            <span className="text-xl">📄</span>
+            <div className="text-left">
+              <div>{downloaded?'✅ PDF opened — choose "Save as PDF" in print dialog':'Download as PDF'}</div>
+              <div className="text-xs font-normal opacity-80">Opens a print-ready page → Save as PDF</div>
+            </div>
+          </button>
+          <button onClick={emailLink} className="w-full flex items-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-500 text-white rounded-xl px-4 py-3 font-semibold text-sm hover:opacity-90 transition-opacity shadow">
+            <span className="text-xl">📧</span>
+            <div className="text-left">
+              <div>Share via Email</div>
+              <div className="text-xs font-normal opacity-80">Opens your email with writing pre-filled</div>
+            </div>
+          </button>
+          <button onClick={copyText} className="w-full flex items-center gap-3 bg-gray-100 text-gray-700 rounded-xl px-4 py-3 font-semibold text-sm hover:bg-gray-200 transition-colors">
+            <span className="text-xl">{copied?'✅':'📋'}</span>
+            <div className="text-left">
+              <div>{copied?'Copied!':'Copy Writing Summary'}</div>
+              <div className="text-xs font-normal text-gray-500">Paste into Google Classroom, email, etc.</div>
+            </div>
+          </button>
+        </div>
+        <p className="text-xs text-center text-gray-400 mt-4">PDF tip: Choose <strong>"Save as PDF"</strong> as the print destination</p>
+      </div>
+    </div>
+  );
+}
+
+// ── Main App ────────────────────────────────────────────────────
+function App(){
+  // ── API key state ──
+  const [apiKey,setApiKey] = React.useState(()=>{
+    if(TEACHER_API_KEY) return TEACHER_API_KEY;
+    return localStorage.getItem('taller_api_key')||'';
+  });
+
+  // ── App state ──
+  const [selectedLevel,setSelectedLevel] = React.useState('noviceLow');
+  const [selectedUnit,setSelectedUnit] = React.useState('all');
+  const [selectedPrompt,setSelectedPrompt] = React.useState(null);
+  const [writingText,setWritingText] = React.useState('');
+  const [feedback,setFeedback] = React.useState(null);
+  const [isLoading,setIsLoading] = React.useState(false);
+  const [view,setView] = React.useState('prompts');
+  const [showShare,setShowShare] = React.useState(false);
+  const [studentName,setStudentName] = React.useState('');
+  const [apiError,setApiError] = React.useState('');
+  const taRef = React.useRef(null);
+
+  // Show setup screen if no API key
+  if(!apiKey) return <ApiKeySetup onSave={k=>setApiKey(k)}/>;
+
+  const level = LEVELS[selectedLevel];
+  const availableUnits = ['all',...Array.from(new Set(PROMPTS.filter(p=>p.level===selectedLevel).map(p=>p.unit)))];
+  const visiblePrompts = PROMPTS.filter(p=>p.level===selectedLevel&&(selectedUnit==='all'||p.unit===selectedUnit));
+  const wordCount = writingText.trim()?writingText.trim().split(/\s+/).length:0;
+
+  const insertChar = (char)=>{
+    const ta = taRef.current; if(!ta) return;
+    const s=ta.selectionStart, e=ta.selectionEnd;
+    const newText = writingText.slice(0,s)+char+writingText.slice(e);
+    setWritingText(newText);
+    setTimeout(()=>{ ta.selectionStart=ta.selectionEnd=s+1; ta.focus(); },0);
+  };
+
+  const selectPrompt = p=>{ setSelectedPrompt(p); setWritingText(''); setFeedback(null); setApiError(''); setView('write'); };
+
+  const reset = ()=>{ setView('prompts'); setSelectedPrompt(null); setWritingText(''); setFeedback(null); setApiError(''); };
+  const revise = ()=>{ setView('write'); setFeedback(null); setApiError(''); };
+
+  const getFeedback = async ()=>{
+    if(!writingText.trim()||!selectedPrompt) return;
+    setIsLoading(true); setFeedback(null); setApiError('');
+    const levelInstructions = selectedLevel==='noviceLow'
+      ? 'This is NOVICE LOW level. Comment ONLY on vocabulary and memorized phrases. Do NOT comment on grammar complexity. Students are writing just 3–10 words total. Praise every attempt warmly.'
+      : 'This is NOVICE MID level. Students are writing 15–40 words using simple sentences. Give ONE simple, clear grammar tip maximum. Focus on helping them build confidence.';
+    const sys = `You are a warm, encouraging Spanish language teacher for ACTFL ${level.label} level middle school beginners (ages 11–14).
+${levelInstructions}
+Rules:
+- Write ALL feedback in clear, simple English that a middle schooler can understand
+- Be VERY warm, positive, and celebratory — ALWAYS lead with genuine praise
+- Keep the total feedback SHORT and easy to read (under 200 words total)
+- Show corrected Spanish with EVERY suggestion
+- Use simple vocabulary — no complicated grammar terms
+- End with genuine, specific encouragement
+- If the student wrote very little, still find something to praise
+Respond ONLY with a valid JSON object (no markdown, no code fences, no extra text before or after):
+{"strengths":["specific praise 1","specific praise 2"],"improvements":[{"issue":"one simple thing to improve","studentText":"exactly what they wrote","correction":"the correct Spanish","explanation":"simple reason in plain English"}],"correctedVersion":"the full corrected Spanish text","encouragement":"a warm, specific closing sentence","culturalNote":"one interesting sentence connecting their writing to the cultural theme of this prompt"}`;
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST",
+        headers:{"Content-Type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+        body:JSON.stringify({
+          model:"claude-sonnet-4-20250514",max_tokens:1000,system:sys,
+          messages:[{role:"user",content:`Student level: ${level.label}\nPrompt topic: ${selectedPrompt.title}\nWriting task: ${selectedPrompt.writingTask}\nStudent's Spanish writing: "${writingText}"`}]
+        })
+      });
+      if(!res.ok){
+        const errData = await res.json().catch(()=>({}));
+        if(res.status===401) throw new Error('Invalid API key. Please check your key and reload the page.');
+        if(res.status===429) throw new Error('Too many requests. Please wait a moment and try again.');
+        throw new Error(errData.error?.message||`API error ${res.status}`);
+      }
+      const data = await res.json();
+      const raw = data.content.map(b=>b.text||'').join('').trim();
+      // Strip any accidental markdown fences
+      const clean = raw.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'').trim();
+      const parsed = JSON.parse(clean);
+      setFeedback(parsed); setView('feedback');
+    } catch(err){
+      setApiError(err.message||'Could not connect. Please check your internet connection and try again.');
+      setView('feedback');
+    } finally { setIsLoading(false); }
+  };
+
+  // Color helpers
+  const isGreen = selectedLevel==='noviceLow';
+  const lvlBg   = isGreen?'bg-green-600':'bg-teal-600';
+  const lvlBorder= isGreen?'border-green-400':'border-teal-400';
+  const lvlText  = isGreen?'text-green-700':'text-teal-700';
+  const lvlBgLight=isGreen?'bg-green-50':'bg-teal-50';
+  const lvlBadge = isGreen?'bg-green-100 text-green-800':'bg-teal-100 text-teal-800';
+  const lvlBtn   = isGreen?'bg-green-600 text-white border-green-600':'bg-teal-600 text-white border-teal-600';
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50">
+      {showShare&&selectedPrompt&&(
+        <ShareModal studentName={studentName} prompt={selectedPrompt} level={level}
+          writingText={writingText} feedback={feedback} onClose={()=>setShowShare(false)}/>
+      )}
+
+      {/* Header */}
+      <header className="bg-gradient-to-r from-red-700 via-orange-600 to-yellow-500 text-white shadow-lg sticky top-0 z-40">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="text-3xl flex-shrink-0">✍️</span>
+            <div className="min-w-0">
+              <h1 className="text-xl font-bold leading-tight whitespace-nowrap">
+                Seño Bluemel <span className="font-normal opacity-90">Taller de Escritura</span>
+              </h1>
+              <p className="text-xs text-orange-100 hidden sm:block">Spanish Writing Lab · ACTFL Spanish 1</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {view!=='prompts'&&(
+              <button onClick={reset} className="text-sm bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full transition-colors whitespace-nowrap">← Prompts</button>
+            )}
+            {(view==='write'||view==='feedback')&&writingText.trim()&&(
+              <button onClick={()=>setShowShare(true)}
+                className="text-sm bg-white text-orange-700 font-semibold hover:bg-orange-50 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow transition-colors whitespace-nowrap">
+                <span>📤</span> Share / PDF
+              </button>
+            )}
+            {!TEACHER_API_KEY&&(
+              <button onClick={()=>{if(confirm('Change API key?')){ localStorage.removeItem('taller_api_key'); setApiKey(''); }}}
+                title="Change API key" className="text-xs bg-white/10 hover:bg-white/20 px-2 py-1.5 rounded-full transition-colors">🔑</button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-5xl mx-auto px-4 py-6">
+        {/* Student name bar (write/feedback views) */}
+        {view!=='prompts'&&(
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="text-sm text-gray-500 font-semibold whitespace-nowrap">Your name:</span>
+            <input value={studentName} onChange={e=>setStudentName(e.target.value)}
+              placeholder="First and last name (for your PDF)"
+              className="flex-1 max-w-xs border-2 border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-orange-400 bg-white"/>
+          </div>
+        )}
+
+        {/* Level Tabs */}
+        <div className="flex gap-3 mb-4">
+          {Object.values(LEVELS).map(lv=>(
+            <button key={lv.id} onClick={()=>{ setSelectedLevel(lv.id); setSelectedUnit('all'); reset(); }}
+              className={`flex-1 py-3 px-3 rounded-xl border-2 font-semibold text-sm transition-all ${
+                selectedLevel===lv.id
+                  ? lv.id==='noviceLow'?'bg-green-600 text-white border-green-600 shadow-md':'bg-teal-600 text-white border-teal-600 shadow-md'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+              }`}>
+              <span className="text-lg">{lv.emoji}</span>
+              <span className="ml-2">{lv.label}</span>
+              <div className="text-xs font-normal mt-0.5 opacity-80 hidden sm:block">{lv.tagline}</div>
+            </button>
+          ))}
+        </div>
+
+        {/* Guidelines bar */}
+        <div className={`${lvlBgLight} border ${lvlBorder} rounded-xl p-4 mb-4`}>
+          <div className="flex items-start gap-4 flex-wrap">
+            <div className="flex-1 min-w-48">
+              <p className={`text-xs font-bold uppercase tracking-wide ${lvlText} mb-2`}>{level.emoji} {level.label} Writing Guidelines</p>
+              <ul className="space-y-1">
+                {level.guidelines.map((g,i)=>(
+                  <li key={i} className="text-xs text-gray-700 flex gap-2"><span className={`${lvlText} font-bold`}>✓</span>{g}</li>
+                ))}
+              </ul>
+            </div>
+            <div className={`${lvlBadge} rounded-lg px-4 py-3 text-center flex-shrink-0`}>
+              <div className="text-2xl font-bold">{level.target}</div>
+              <div className="text-xs font-semibold">word target</div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── PROMPT LIST ── */}
+        {view==='prompts'&&(
+          <div>
+            {/* Unit filter */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              {availableUnits.map(uid=>{
+                const u = uid==='all'?{label:'All Topics',emoji:'📚'}:UNITS[uid];
+                const count = uid==='all'?PROMPTS.filter(p=>p.level===selectedLevel).length
+                  :PROMPTS.filter(p=>p.level===selectedLevel&&p.unit===uid).length;
+                return (
+                  <button key={uid} onClick={()=>setSelectedUnit(uid)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border-2 transition-all ${
+                      selectedUnit===uid ? lvlBtn : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+                    }`}>
+                    <span>{u?.emoji}</span><span>{u?.label}</span>
+                    <span className={`ml-1 px-1.5 py-0.5 rounded-full text-xs ${selectedUnit===uid?'bg-white/25':'bg-gray-100'}`}>{count}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {visiblePrompts.map(p=>(
+                <button key={p.id} onClick={()=>selectPrompt(p)}
+                  className="text-left bg-white rounded-xl border-2 border-gray-200 hover:border-orange-400 hover:shadow-md transition-all p-4 group">
+                  <div className="flex items-start justify-between mb-2">
+                    <span className="text-3xl">{p.emoji}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 font-semibold border border-orange-200 text-right leading-tight">
+                      {UNITS[p.unit]?.emoji} {UNITS[p.unit]?.label}
+                    </span>
+                  </div>
+                  <div className="font-bold text-gray-800 text-sm group-hover:text-orange-600 transition-colors">{p.title}</div>
+                  <div className="text-xs text-gray-500 mt-1 leading-snug">{p.culturalTheme}</div>
+                  <div className="mt-3 text-xs text-orange-600 font-semibold">Start writing →</div>
+                </button>
+              ))}
+            </div>
+            <p className="text-center text-xs text-gray-400 mt-6">
+              {PROMPTS.filter(p=>p.level===selectedLevel).length} writing topics · Aligned to ACTFL Spanish 1 Curriculum
+            </p>
+          </div>
+        )}
+
+        {/* ── WRITE & FEEDBACK ── */}
+        {(view==='write'||view==='feedback')&&selectedPrompt&&(
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+            {/* Left panel: prompt context */}
+            <div className="lg:col-span-2 space-y-4">
+              <div className="bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-xl p-4 shadow">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-2xl">{selectedPrompt.emoji}</span>
+                  <div><p className="font-bold text-sm">{selectedPrompt.title}</p>
+                    <p className="text-xs text-orange-200">{selectedPrompt.culturalRegion}</p></div>
+                </div>
+                <p className="text-xs font-bold uppercase tracking-wide text-orange-200 mb-1">🌍 Cultural Context</p>
+                <p className="text-xs leading-relaxed text-orange-50">{selectedPrompt.culturalFact}</p>
+              </div>
+              <div className="bg-white rounded-xl border-2 border-orange-200 p-4">
+                <p className="text-xs font-bold text-orange-600 uppercase tracking-wide mb-2">📝 Your Writing Task</p>
+                <p className="text-sm font-semibold text-gray-800">{selectedPrompt.writingTask}</p>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">🔑 Helpful Phrases</p>
+                <div className="space-y-2">
+                  {selectedPrompt.scaffolding.map((s,i)=>(
+                    <div key={i} className="flex justify-between items-start gap-2 py-1 border-b border-gray-100 last:border-0">
+                      <code className={`text-xs font-bold ${lvlText} bg-gray-50 rounded px-2 py-0.5 flex-shrink-0`}>{s.phrase}</code>
+                      <span className="text-xs text-gray-500 text-right">{s.meaning}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-amber-50 border border-amber-300 rounded-xl p-4">
+                <p className="text-xs text-gray-700 leading-relaxed">{selectedPrompt.grammarTip}</p>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">💬 Example Response</p>
+                <p className="text-sm italic text-gray-700 leading-relaxed">"{selectedPrompt.example}"</p>
+              </div>
+            </div>
+
+            {/* Right panel: writing / feedback */}
+            <div className="lg:col-span-3 space-y-4">
+              {/* Special characters */}
+              <div className="bg-white rounded-xl border border-gray-200 p-3">
+                <p className="text-xs text-gray-500 font-semibold mb-2">⌨️ Spanish Characters — Click to Insert:</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {SPECIAL_CHARS.map(({c})=>(
+                    <button key={c} onClick={()=>insertChar(c)}
+                      className={`w-9 h-9 rounded-lg border-2 font-bold text-sm hover:scale-110 transition-transform ${
+                        isGreen?'border-green-300 bg-green-50 text-green-800 hover:bg-green-100':'border-teal-300 bg-teal-50 text-teal-800 hover:bg-teal-100'
+                      }`}>{c}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Writing textarea */}
+              {view==='write'&&(
+                <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden shadow-sm">
+                  <div className={`${lvlBg} text-white px-4 py-2 flex justify-between items-center`}>
+                    <span className="text-sm font-semibold">Write in Spanish ✍️</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full bg-white/20 ${wordCount>0&&'font-bold'}`}>
+                      {wordCount} {wordCount===1?'word':'words'} · Target: {level.target}
+                    </span>
+                  </div>
+                  <textarea
+                    ref={taRef} value={writingText} onChange={e=>setWritingText(e.target.value)}
+                    placeholder={`Escribe aquí en español…\n\nTip: Click the buttons above to insert á, é, í, ó, ú, ñ, ¿, ¡`}
+                    className="w-full p-4 text-gray-800 text-base resize-none focus:outline-none min-h-48"
+                    spellCheck={false} autoCorrect="off" autoCapitalize="off"
+                  />
+                  <div className="px-4 pb-4 flex justify-between items-center gap-3 flex-wrap">
+                    <div className="text-xs text-gray-400 italic min-w-0 truncate">Try: "{level.starters[0]}"</div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      {writingText.trim()&&(
+                        <button onClick={()=>setShowShare(true)}
+                          className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-orange-100 text-orange-700 hover:bg-orange-200 transition-colors flex items-center gap-1.5">
+                          📤 Share
+                        </button>
+                      )}
+                      <button onClick={getFeedback} disabled={!writingText.trim()||isLoading}
+                        className={`px-5 py-2.5 rounded-xl text-white font-bold text-sm transition-all ${
+                          !writingText.trim()||isLoading?'bg-gray-300 cursor-not-allowed':`${lvlBg} hover:opacity-90 shadow-md`
+                        }`}>
+                        {isLoading?(
+                          <span className="flex items-center gap-2">
+                            <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                            </svg>Checking…
+                          </span>
+                        ):'✨ Get Feedback'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Feedback */}
+              {view==='feedback'&&(
+                <div className="space-y-4">
+                  <div className="bg-white rounded-xl border-2 border-gray-200 p-4">
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Your Writing</p>
+                    <p className="text-sm text-gray-800 leading-relaxed italic">"{writingText}"</p>
+                  </div>
+
+                  {apiError?(
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
+                      <p className="font-semibold mb-1">⚠️ Oops!</p>
+                      <p>{apiError}</p>
+                      <button onClick={revise} className="mt-3 text-sm underline text-red-600">← Go back and try again</button>
+                    </div>
+                  ):feedback?(
+                    <>
+                      {feedback.strengths?.length>0&&(
+                        <div className="bg-green-50 border-2 border-green-300 rounded-xl p-4">
+                          <p className="text-sm font-bold text-green-700 mb-3">🌟 What You Did Well</p>
+                          <ul className="space-y-2">
+                            {feedback.strengths.map((s,i)=>(
+                              <li key={i} className="flex gap-2 text-sm text-green-800"><span className="font-bold">✓</span>{s}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {feedback.improvements?.length>0&&(
+                        <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
+                          <p className="text-sm font-bold text-blue-700 mb-3">📚 One Thing to Improve</p>
+                          {feedback.improvements.map((imp,i)=>(
+                            <div key={i} className="space-y-2">
+                              <p className="text-sm text-blue-800 font-semibold">{imp.issue}</p>
+                              {imp.studentText&&(
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="text-xs bg-red-100 text-red-700 line-through px-2 py-1 rounded font-mono">{imp.studentText}</span>
+                                  <span className="text-gray-400">→</span>
+                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-bold font-mono">{imp.correction}</span>
+                                </div>
+                              )}
+                              <p className="text-xs text-gray-600">{imp.explanation}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {feedback.correctedVersion&&(
+                        <div className={`${lvlBgLight} border-2 ${lvlBorder} rounded-xl p-4`}>
+                          <p className={`text-xs font-bold ${lvlText} uppercase tracking-wide mb-2`}>✅ Polished Version</p>
+                          <p className="text-sm font-semibold text-gray-800 italic leading-relaxed">"{feedback.correctedVersion}"</p>
+                        </div>
+                      )}
+                      {feedback.culturalNote&&(
+                        <div className="bg-orange-50 border border-orange-200 rounded-xl p-3">
+                          <p className="text-xs text-orange-700">🌍 <strong>Cultural Connection:</strong> {feedback.culturalNote}</p>
+                        </div>
+                      )}
+                      {feedback.encouragement&&(
+                        <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-4 text-center">
+                          <p className="text-sm font-semibold text-yellow-800">🎉 {feedback.encouragement}</p>
+                        </div>
+                      )}
+                      <div className="flex gap-3 flex-wrap">
+                        <button onClick={revise} className={`flex-1 py-2.5 rounded-xl text-white font-bold text-sm ${lvlBg} hover:opacity-90 transition-opacity min-w-28`}>✏️ Revise</button>
+                        <button onClick={()=>setShowShare(true)} className="flex-1 py-2.5 rounded-xl text-white font-bold text-sm bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-90 transition-opacity min-w-36">📤 Share / PDF</button>
+                        <button onClick={reset} className="flex-1 py-2.5 rounded-xl text-gray-700 font-bold text-sm bg-white border-2 border-gray-300 hover:bg-gray-50 min-w-28">📝 New Topic</button>
+                      </div>
+                    </>
+                  ):null}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <footer className="text-center py-6 text-xs text-gray-400 mt-8 border-t border-gray-200">
+        Seño Bluemel Taller de Escritura · 25 Topics · ACTFL Spanish 1 Curriculum · Novice Low & Novice Mid
+      </footer>
+    </div>
+  );
+}
+
+// ── Mount ──────────────────────────────────────────────────────
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
+  </script>
+</body>
+</html>
